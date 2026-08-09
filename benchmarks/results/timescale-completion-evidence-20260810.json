@@ -1,0 +1,922 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "generatedAt": "2026-08-09T22:13:54.479Z",
+  "runId": "timescale-completion-evidence-20260810",
+  "engine": "timescale",
+  "config": {
+    "apiUrl": "http://127.0.0.1:18110",
+    "composeProject": "timescale-completion-evidence-20260810",
+    "composeFile": "/media/falfaddaghi/extradrive2/repo/timescale_challenge/docker-compose.yml",
+    "composeOverride": "/media/falfaddaghi/extradrive2/repo/timescale_challenge/benchmarks/results/timescale-completion-evidence-20260810.compose.override.yml",
+    "databaseService": "timescaledb",
+    "databaseContainer": "e900e88382e3d2d904e1de19d971f0f51c7f09088a105547e6f4f7e36e1e5831",
+    "retentionDays": 1,
+    "retentionIntervalMs": 1000,
+    "anchor": "2026-08-09T22:13:54.000Z",
+    "datasets": {
+      "combinedRows": 54,
+      "tiedCursorRows": 73,
+      "noiseRows": 5000,
+      "oldRetentionRows": 300,
+      "concurrentNewRows": 6000
+    }
+  },
+  "commands": {
+    "composeUp": "API_HOST_PORT=18110 TIMESCALE_HOST_PORT=15490 docker compose -p timescale-completion-evidence-20260810 -f docker-compose.yml -f benchmarks/results/timescale-completion-evidence-20260810.compose.override.yml up -d --build",
+    "readiness": "curl --fail http://127.0.0.1:18110/health",
+    "probe": "API_URL=http://127.0.0.1:18110 COMPOSE_PROJECT=timescale-completion-evidence-20260810 node benchmarks/timescale-completion-evidence.mjs",
+    "composeDown": "API_HOST_PORT=18110 TIMESCALE_HOST_PORT=15490 docker compose -p timescale-completion-evidence-20260810 -f docker-compose.yml -f benchmarks/results/timescale-completion-evidence-20260810.compose.override.yml down -v --remove-orphans"
+  },
+  "readiness": {
+    "ok": true,
+    "attempts": [
+      {
+        "status": 200,
+        "ok": true,
+        "latencyMs": 30.18,
+        "error": null
+      }
+    ],
+    "elapsedMs": 32
+  },
+  "insertions": {
+    "combined": {
+      "requests": 1,
+      "attempted": 54,
+      "accepted": 54,
+      "rejected": 0,
+      "failures": [],
+      "latency": {
+        "count": 1,
+        "p50Ms": 65.402,
+        "p95Ms": 65.402,
+        "p99Ms": 65.402,
+        "maxMs": 65.402
+      }
+    },
+    "cursor": {
+      "requests": 1,
+      "attempted": 73,
+      "accepted": 73,
+      "rejected": 0,
+      "failures": [],
+      "latency": {
+        "count": 1,
+        "p50Ms": 9.176,
+        "p95Ms": 9.176,
+        "p99Ms": 9.176,
+        "maxMs": 9.176
+      }
+    },
+    "noise": {
+      "requests": 20,
+      "attempted": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "failures": [],
+      "latency": {
+        "count": 20,
+        "p50Ms": 12.68,
+        "p95Ms": 24.986,
+        "p99Ms": 54.415,
+        "maxMs": 61.772
+      }
+    },
+    "retentionOld": {
+      "requests": 2,
+      "attempted": 300,
+      "accepted": 300,
+      "rejected": 0,
+      "failures": [],
+      "latency": {
+        "count": 2,
+        "p50Ms": 61.482,
+        "p95Ms": 109.613,
+        "p99Ms": 113.891,
+        "maxMs": 114.961
+      }
+    }
+  },
+  "httpEvidence": {
+    "combinedFilters": {
+      "request": {
+        "service": "filter-evidence",
+        "level": "warn",
+        "since": "2026-08-09T21:58:53.000Z",
+        "until": "2026-08-09T21:58:55.000Z",
+        "attr.run_id": "timescale-completion-evidence-20260810",
+        "attr.phase": "combined",
+        "q": "needle-evidence",
+        "limit": 100
+      },
+      "status": 200,
+      "ok": true,
+      "returned": 50,
+      "expected": 50,
+      "nextCursor": null,
+      "ordering": {
+        "checked": 49,
+        "violations": []
+      },
+      "allRowsMatch": true
+    },
+    "cursorAggregate": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 5.197,
+      "error": null,
+      "buckets": [
+        {
+          "start": "2026-08-09T22:01:00.000Z",
+          "group": "cursor-evidence",
+          "count": 73
+        }
+      ],
+      "total": 73
+    },
+    "cursorTraversal": {
+      "pageSize": 7,
+      "expectedRows": 73,
+      "pages": [
+        {
+          "page": 1,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.444,
+          "error": null
+        },
+        {
+          "page": 2,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.461,
+          "error": null
+        },
+        {
+          "page": 3,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.301,
+          "error": null
+        },
+        {
+          "page": 4,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.103,
+          "error": null
+        },
+        {
+          "page": 5,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.063,
+          "error": null
+        },
+        {
+          "page": 6,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.107,
+          "error": null
+        },
+        {
+          "page": 7,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.095,
+          "error": null
+        },
+        {
+          "page": 8,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.204,
+          "error": null
+        },
+        {
+          "page": 9,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.154,
+          "error": null
+        },
+        {
+          "page": 10,
+          "status": 200,
+          "ok": true,
+          "count": 7,
+          "nextCursorPresent": true,
+          "latencyMs": 1.087,
+          "error": null
+        },
+        {
+          "page": 11,
+          "status": 200,
+          "ok": true,
+          "count": 3,
+          "nextCursorPresent": false,
+          "latencyMs": 1.086,
+          "error": null
+        }
+      ],
+      "returnedRows": 73,
+      "uniqueRows": 73,
+      "duplicateRows": 0,
+      "missingMessages": [],
+      "unexpectedMessages": [],
+      "omissionsAgainstAggregate": 0,
+      "aggregateCount": 73,
+      "ordering": {
+        "checked": 72,
+        "violations": []
+      },
+      "fatalError": null,
+      "complete": true
+    }
+  },
+  "sqlEvidence": {
+    "indexes": [
+      {
+        "indexname": "logs_attributes_gin_idx",
+        "indexdef": "CREATE INDEX logs_attributes_gin_idx ON public.logs USING gin (attributes jsonb_path_ops)"
+      },
+      {
+        "indexname": "logs_id_timestamp_uidx",
+        "indexdef": "CREATE UNIQUE INDEX logs_id_timestamp_uidx ON public.logs USING btree (id, \"timestamp\")"
+      },
+      {
+        "indexname": "logs_level_timestamp_id_idx",
+        "indexdef": "CREATE INDEX logs_level_timestamp_id_idx ON public.logs USING btree (level, \"timestamp\" DESC, id DESC)"
+      },
+      {
+        "indexname": "logs_message_trgm_idx",
+        "indexdef": "CREATE INDEX logs_message_trgm_idx ON public.logs USING gin (message gin_trgm_ops)"
+      },
+      {
+        "indexname": "logs_service_timestamp_id_idx",
+        "indexdef": "CREATE INDEX logs_service_timestamp_id_idx ON public.logs USING btree (service, \"timestamp\" DESC, id DESC)"
+      },
+      {
+        "indexname": "logs_timestamp_id_idx",
+        "indexdef": "CREATE INDEX logs_timestamp_id_idx ON public.logs USING btree (\"timestamp\" DESC, id DESC)"
+      },
+      {
+        "indexname": "logs_timestamp_idx",
+        "indexdef": "CREATE INDEX logs_timestamp_idx ON public.logs USING btree (\"timestamp\" DESC)"
+      }
+    ],
+    "hypertables": [
+      {
+        "hypertable_schema": "public",
+        "hypertable_name": "logs",
+        "num_dimensions": 1,
+        "num_chunks": 4,
+        "compression_enabled": false,
+        "primary_dimension": "timestamp",
+        "primary_dimension_type": "timestamp with time zone"
+      }
+    ],
+    "chunksBeforeRetention": [
+      {
+        "chunk_schema": "_timescaledb_internal",
+        "chunk_name": "_hyper_1_2_chunk",
+        "range_start": "2026-07-09 00:00:00+00",
+        "range_end": "2026-07-16 00:00:00+00"
+      },
+      {
+        "chunk_schema": "_timescaledb_internal",
+        "chunk_name": "_hyper_1_3_chunk",
+        "range_start": "2026-07-16 00:00:00+00",
+        "range_end": "2026-07-23 00:00:00+00"
+      },
+      {
+        "chunk_schema": "_timescaledb_internal",
+        "chunk_name": "_hyper_1_4_chunk",
+        "range_start": "2026-07-30 00:00:00+00",
+        "range_end": "2026-08-06 00:00:00+00"
+      },
+      {
+        "chunk_schema": "_timescaledb_internal",
+        "chunk_name": "_hyper_1_1_chunk",
+        "range_start": "2026-08-06 00:00:00+00",
+        "range_end": "2026-08-13 00:00:00+00"
+      }
+    ],
+    "chunksAfterRetention": [
+      {
+        "chunk_schema": "_timescaledb_internal",
+        "chunk_name": "_hyper_1_1_chunk",
+        "range_start": "2026-08-06 00:00:00+00",
+        "range_end": "2026-08-13 00:00:00+00"
+      }
+    ],
+    "filteredLogsExplain": {
+      "sql": "EXPLAIN (ANALYZE, BUFFERS, SETTINGS, FORMAT JSON) SELECT \"id\"::text AS \"id\", \"timestamp\", \"level\", \"service\", \"message\", \"attributes\" FROM \"logs\" WHERE \"service\" = 'filter-evidence' AND \"level\" = 'warn' AND \"timestamp\" >= '2026-08-09T21:58:53.000Z'::timestamptz AND \"timestamp\" < '2026-08-09T21:58:55.000Z'::timestamptz AND (attributes @> jsonb_build_object('run_id'::text, to_jsonb('timescale-completion-evidence-20260810'::text)) OR (attributes ->> 'run_id'::text) = 'timescale-completion-evidence-20260810'::text) AND (attributes @> jsonb_build_object('phase'::text, to_jsonb('combined'::text)) OR (attributes ->> 'phase'::text) = 'combined'::text) AND \"message\" ILIKE ('%' || 'needle-evidence' || '%') ESCAPE '\\' ORDER BY \"timestamp\" DESC, \"id\" DESC LIMIT 101",
+      "format": "JSON",
+      "options": [
+        "ANALYZE",
+        "BUFFERS",
+        "SETTINGS"
+      ],
+      "ok": true,
+      "rootNode": "Limit",
+      "nodes": [
+        {
+          "nodeType": "Limit",
+          "indexName": null,
+          "relationName": null,
+          "actualRows": 50,
+          "actualTotalTimeMs": 0.19,
+          "loops": 1
+        },
+        {
+          "nodeType": "Incremental Sort",
+          "indexName": null,
+          "relationName": null,
+          "actualRows": 50,
+          "actualTotalTimeMs": 0.187,
+          "loops": 1
+        },
+        {
+          "nodeType": "Result",
+          "indexName": null,
+          "relationName": null,
+          "actualRows": 50,
+          "actualTotalTimeMs": 0.124,
+          "loops": 1
+        },
+        {
+          "nodeType": "Custom Scan",
+          "indexName": null,
+          "relationName": "logs",
+          "actualRows": 50,
+          "actualTotalTimeMs": 0.113,
+          "loops": 1
+        },
+        {
+          "nodeType": "Index Scan",
+          "indexName": "_hyper_1_1_chunk_logs_level_timestamp_id_idx",
+          "relationName": "_hyper_1_1_chunk",
+          "actualRows": 50,
+          "actualTotalTimeMs": 0.109,
+          "loops": 1
+        }
+      ],
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 2.56,
+            "Total Cost": 2.6,
+            "Plan Rows": 2,
+            "Plan Width": 168,
+            "Actual Startup Time": 0.186,
+            "Actual Total Time": 0.19,
+            "Actual Rows": 50,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 29,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Incremental Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 2.56,
+                "Total Cost": 2.6,
+                "Plan Rows": 2,
+                "Plan Width": 168,
+                "Actual Startup Time": 0.185,
+                "Actual Total Time": 0.187,
+                "Actual Rows": 50,
+                "Actual Loops": 1,
+                "Sort Key": [
+                  "logs.\"timestamp\" DESC",
+                  "((logs.id)::text) DESC"
+                ],
+                "Presorted Key": [
+                  "logs.\"timestamp\""
+                ],
+                "Full-sort Groups": {
+                  "Group Count": 1,
+                  "Sort Methods Used": [
+                    "quicksort"
+                  ],
+                  "Sort Space Memory": {
+                    "Average Sort Space Used": 37,
+                    "Peak Sort Space Used": 37
+                  }
+                },
+                "Shared Hit Blocks": 29,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Result",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 0.28,
+                    "Total Cost": 2.55,
+                    "Plan Rows": 1,
+                    "Plan Width": 168,
+                    "Actual Startup Time": 0.032,
+                    "Actual Total Time": 0.124,
+                    "Actual Rows": 50,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 20,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Custom Scan",
+                        "Parent Relationship": "Outer",
+                        "Custom Plan Provider": "ChunkAppend",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Relation Name": "logs",
+                        "Alias": "logs",
+                        "Startup Cost": 0.28,
+                        "Total Cost": 2.54,
+                        "Plan Rows": 1,
+                        "Plan Width": 152,
+                        "Actual Startup Time": 0.027,
+                        "Actual Total Time": 0.113,
+                        "Actual Rows": 50,
+                        "Actual Loops": 1,
+                        "Order": [
+                          "logs.\"timestamp\" DESC"
+                        ],
+                        "Startup Exclusion": true,
+                        "Runtime Exclusion": false,
+                        "Chunks excluded during startup": 0,
+                        "Shared Hit Blocks": 20,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Plans": [
+                          {
+                            "Node Type": "Index Scan",
+                            "Parent Relationship": "child",
+                            "Parallel Aware": false,
+                            "Async Capable": false,
+                            "Scan Direction": "Forward",
+                            "Index Name": "_hyper_1_1_chunk_logs_level_timestamp_id_idx",
+                            "Relation Name": "_hyper_1_1_chunk",
+                            "Alias": "_hyper_1_1_chunk",
+                            "Startup Cost": 0.28,
+                            "Total Cost": 2.54,
+                            "Plan Rows": 1,
+                            "Plan Width": 152,
+                            "Actual Startup Time": 0.026,
+                            "Actual Total Time": 0.109,
+                            "Actual Rows": 50,
+                            "Actual Loops": 1,
+                            "Index Cond": "((level = 'warn'::text) AND (\"timestamp\" >= '2026-08-09 21:58:53+00'::timestamp with time zone) AND (\"timestamp\" < '2026-08-09 21:58:55+00'::timestamp with time zone))",
+                            "Rows Removed by Index Recheck": 0,
+                            "Filter": "((message ~~* '%needle-evidence%'::text) AND (service = 'filter-evidence'::text) AND ((attributes @> jsonb_build_object('run_id'::text, to_jsonb('timescale-completion-evidence-20260810'::text))) OR ((attributes ->> 'run_id'::text) = 'timescale-completion-evidence-20260810'::text)) AND ((attributes @> jsonb_build_object('phase'::text, to_jsonb('combined'::text))) OR ((attributes ->> 'phase'::text) = 'combined'::text)))",
+                            "Rows Removed by Filter": 3,
+                            "Shared Hit Blocks": 20,
+                            "Shared Read Blocks": 0,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Local Hit Blocks": 0,
+                            "Local Read Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Settings": {
+            "work_mem": "42669kB",
+            "effective_io_concurrency": "256",
+            "max_parallel_workers_per_gather": "12",
+            "max_parallel_workers": "24",
+            "random_page_cost": "1.1",
+            "effective_cache_size": "96005MB",
+            "jit": "off"
+          },
+          "Planning": {
+            "Shared Hit Blocks": 925,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 4.619,
+          "Triggers": [],
+          "Execution Time": 0.372
+        }
+      ],
+      "stderr": null
+    },
+    "retentionPolicy": [
+      {
+        "job_id": 1000,
+        "application_name": "Retention Policy [1000]",
+        "schedule_interval": "1 day",
+        "max_runtime": "00:05:00",
+        "max_retries": -1,
+        "retry_period": "00:05:00",
+        "proc_schema": "_timescaledb_functions",
+        "proc_name": "policy_retention",
+        "owner": "postgres",
+        "scheduled": true,
+        "fixed_schedule": false,
+        "config": {
+          "drop_after": "1 day",
+          "hypertable_id": 1
+        },
+        "next_start": "2026-08-10T22:13:50.594557+00:00",
+        "initial_start": null,
+        "hypertable_schema": "public",
+        "hypertable_name": "logs",
+        "check_schema": "_timescaledb_functions",
+        "check_name": "policy_retention_check"
+      }
+    ]
+  },
+  "retention": {
+    "configured": {
+      "retentionDays": 1,
+      "intervalMs": 1000,
+      "source": "/media/falfaddaghi/extradrive2/repo/timescale_challenge/benchmarks/results/timescale-completion-evidence-20260810.compose.override.yml"
+    },
+    "oldRows": {
+      "before": 300,
+      "after": 0,
+      "removed": true,
+      "pollSamples": [
+        {
+          "elapsedMs": 1080.664,
+          "count": 300,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 1395.313,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 1720.876,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 2037.644,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 2347.65,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 2654.349,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 2966.588,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 3279.177,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 3588.357,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 3900.871,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 4215.174,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 4532.623,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 4850.946,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 5167.119,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 5485.769,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 5797.541,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 6108.151,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 6421.217,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 6740.911,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 7060.56,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 7384.18,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 7704.04,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 8021.75,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 8329.357,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 8645.553,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 8960.618,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 9273.519,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 9591.832,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 9901.789,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 10219.358,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 10545.521,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 10857.461,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 11164.325,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 11477.738,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 11785.937,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 12110.452,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 12421.695,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 12747.499,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 13059.266,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 13373.337,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 13688.332,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 13998.129,
+          "count": 0,
+          "ok": true,
+          "error": null
+        },
+        {
+          "elapsedMs": 14297.158,
+          "count": 0,
+          "ok": true,
+          "error": null
+        }
+      ],
+      "removedDuringConcurrentStream": true
+    },
+    "stream": {
+      "targetLogsPerSecond": 500,
+      "durationSec": 12,
+      "batchSize": 50,
+      "sentRows": 6000,
+      "acceptedRows": 6000,
+      "rejectedRows": 0,
+      "errorRequests": 0,
+      "startedAt": "2026-08-09T22:13:55.461Z",
+      "endedAt": "2026-08-09T22:14:07.407Z",
+      "dispatchWindowMs": 11999.133,
+      "completionWindowMs": 11945.67,
+      "dispatchLogsPerSecond": 500.036,
+      "completionLogsPerSecond": 502.274,
+      "latency": {
+        "count": 120,
+        "p50Ms": 10.108,
+        "p95Ms": 18.62,
+        "p99Ms": 61.928,
+        "maxMs": 145.356
+      },
+      "responseStatusCounts": {
+        "200": 120
+      },
+      "failures": []
+    },
+    "newRows": {
+      "expected": 6000,
+      "aggregate": {
+        "ok": true,
+        "status": 200,
+        "latencyMs": 10.295,
+        "error": null,
+        "buckets": [
+          {
+            "start": "2026-08-09T22:13:00.000Z",
+            "group": "retention-new",
+            "count": 6000
+          }
+        ],
+        "total": 6000
+      },
+      "listStatus": 200,
+      "listOk": true,
+      "retained": true
+    }
+  },
+  "failures": []
+}

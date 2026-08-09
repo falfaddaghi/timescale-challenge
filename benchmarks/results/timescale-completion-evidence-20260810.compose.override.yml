@@ -1,0 +1,7 @@
+# Targeted completion-evidence stack. Host ports are supplied by the command
+# so this override does not bind or alter the repository's default ports.
+services:
+  api:
+    environment:
+      RETENTION_DAYS: "1"
+      RETENTION_INTERVAL_MS: "1000"

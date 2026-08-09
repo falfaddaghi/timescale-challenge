@@ -1,0 +1,96 @@
+{
+  "runId": "sqlite-full-1m-500lps-30s-20260810",
+  "engine": "sqlite",
+  "composeProject": "timescale-challenge-sqlite-full",
+  "container": "timescale-challenge-sqlite-full-api-1",
+  "hostUrl": "http://127.0.0.1:18081",
+  "smokeArtifact": "benchmarks/results/log-benchmark-20260809213222045-sqlite-smoke-20260810.json",
+  "benchmarkArtifact": "benchmarks/results/log-benchmark-20260809213239108-sqlite-full-1m-500lps-30s-20260810.json",
+  "protocol": {
+    "seedRows": 1000000,
+    "batchSize": 500,
+    "rate": 500,
+    "durationSec": 30,
+    "seed": 20260720,
+    "bucket": "1m",
+    "sampleIntervalMs": 1000,
+    "maxInFlight": 256,
+    "baseAgeMs": 600000,
+    "timestampSpanMs": 60000
+  },
+  "correctness": {
+    "status": "passed",
+    "failures": 0,
+    "seedAcceptedRows": 1000000,
+    "streamAcceptedRows": 15000,
+    "totalAcceptedRows": 1015000,
+    "seedRejectedRows": 0,
+    "streamRejectedRows": 0,
+    "seedPersisted": true,
+    "samplesCorrect": true,
+    "finalPersisted": true,
+    "overall": true
+  },
+  "latencyMs": {
+    "ingest": {
+      "count": 2030,
+      "p50": 100.898,
+      "p95": 228.507,
+      "p99": 8610.921
+    },
+    "aggregate": {
+      "count": 5,
+      "p50": 19732.667,
+      "p95": 23824.772,
+      "p99": 24394.138
+    }
+  },
+  "elapsedMs": {
+    "seed": 211253.887,
+    "stream": 65243.366,
+    "total": 315548.834
+  },
+  "throughput": {
+    "seedAcceptedLogsPerSecond": 4733.77,
+    "streamAcceptedLogsPerSecond": 229.912,
+    "streamScheduledLogsPerSecond": 500,
+    "streamActualDispatchLogsPerSecond": 500.007,
+    "totalAcceptedLogsPerSecond": 3216.618
+  },
+  "database": {
+    "rowCount": 1025500,
+    "fullRunCount": 1015000,
+    "fullRunSeedCount": 1000000,
+    "files": {
+      "logs.sqlite": 870043648,
+      "logs.sqlite-shm": 32768,
+      "logs.sqlite-wal": 8128792
+    },
+    "aggregate": {
+      "query": "1m service grouping with run_id and phase=seed filters",
+      "rows": 16,
+      "total": 1000000,
+      "elapsedMs": 19990.671,
+      "explainQueryPlan": [
+        "SEARCH logs USING INDEX logs_timestamp_id_idx (timestamp>? AND timestamp<?)",
+        "SCAN attribute EXISTS VIRTUAL TABLE INDEX 1:",
+        "SCAN attribute EXISTS VIRTUAL TABLE INDEX 1:",
+        "USE TEMP B-TREE FOR GROUP BY"
+      ]
+    }
+  },
+  "containerStatsSnapshot": {
+    "cpuPercent": 0,
+    "memory": "79.07MiB / 125GiB",
+    "memoryPercent": 0.06,
+    "networkIo": "233MB / 889kB",
+    "blockIo": "4.64GB / 12.6GB",
+    "pids": 11,
+    "restartCount": 0
+  },
+  "commands": {
+    "composeUp": "API_HOST_PORT=18081 docker compose -p timescale-challenge-sqlite-full -f compose.sqlite.yml up -d --build",
+    "smoke": "node benchmarks/bench.mjs --smoke --url http://127.0.0.1:18081 --engine sqlite --run-id sqlite-smoke-20260810",
+    "full": "node benchmarks/bench.mjs --url http://127.0.0.1:18081 --engine sqlite --rows 1000000 --batch-size 500 --duration 30 --rate 500 --seed 20260720 --sample-interval-ms 1000 --bucket 1m --max-in-flight 256 --base-age-ms 600000 --timestamp-span-ms 60000 --timeout-ms 30000 --health-timeout-ms 30000 --run-id sqlite-full-1m-500lps-30s-20260810 --output-dir benchmarks/results"
+  }
+}

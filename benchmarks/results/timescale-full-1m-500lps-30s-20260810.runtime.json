@@ -1,0 +1,90 @@
+{
+  "runId": "timescale-full-1m-500lps-30s-20260810",
+  "engine": "timescale",
+  "composeProject": "timescale-bench-20260810",
+  "hostUrl": "http://127.0.0.1:18080",
+  "databaseHostPort": 15432,
+  "smokeArtifact": "benchmarks/results/log-benchmark-20260809212535033-timescale-smoke-20260810.json",
+  "benchmarkArtifact": "benchmarks/results/log-benchmark-20260809212554868-timescale-full-1m-500lps-30s-20260810.json",
+  "protocol": {
+    "seedRows": 1000000,
+    "batchSize": 500,
+    "rate": 500,
+    "durationSec": 30,
+    "seed": 20260720,
+    "bucket": "1m",
+    "sampleIntervalMs": 1000,
+    "maxInFlight": 256,
+    "baseAgeMs": 600000,
+    "timestampSpanMs": 60000
+  },
+  "correctness": {
+    "status": "passed",
+    "failures": 0,
+    "seedAcceptedRows": 1000000,
+    "streamAcceptedRows": 15000,
+    "totalAcceptedRows": 1015000,
+    "seedRejectedRows": 0,
+    "streamRejectedRows": 0,
+    "seedPersisted": true,
+    "samplesCorrect": true,
+    "finalPersisted": true,
+    "overall": true
+  },
+  "elapsedMs": {
+    "seed": 87878.812,
+    "stream": 30001.229,
+    "total": 118494.077
+  },
+  "throughput": {
+    "seedAcceptedLogsPerSecond": 11379.798,
+    "streamAcceptedLogsPerSecond": 499.991,
+    "streamScheduledLogsPerSecond": 500,
+    "streamActualDispatchLogsPerSecond": 500.008,
+    "totalAcceptedLogsPerSecond": 8565.831
+  },
+  "database": {
+    "rowCount": 1025500,
+    "fullRunCount": 1015000,
+    "fullRunSeedCount": 1000000,
+    "databaseSizeReadable": "601 MB",
+    "hypertableSizeReadable": "591 MB",
+    "aggregate": {
+      "query": "1m service grouping with run_id and phase=seed filters",
+      "rows": 16,
+      "total": 1000000,
+      "elapsedMs": 354.976
+    }
+  },
+  "explain": {
+    "artifact": "benchmarks/results/timescale-full-1m-500lps-30s-20260810.explain.json",
+    "rootNode": "Sort",
+    "actualTotalTimeMs": 354.976,
+    "workersPlanned": 3,
+    "workersLaunched": 3,
+    "sharedHitBlocks": 26993,
+    "sharedReadBlocks": 0,
+    "tempReadBlocks": 0,
+    "tempWrittenBlocks": 0,
+    "actualAggregateRows": 16
+  },
+  "containerStatsSnapshot": {
+    "api": {
+      "cpuPercent": 0,
+      "memory": "58.34MiB / 125GiB",
+      "memoryPercent": 0.05,
+      "networkIo": "237MB / 329MB",
+      "blockIo": "88.7MB / 0B",
+      "pids": 11
+    },
+    "timescaledb": {
+      "cpuPercent": 0.07,
+      "memory": "1.238GiB / 125GiB",
+      "memoryPercent": 0.99,
+      "networkIo": "328MB / 614kB",
+      "blockIo": "107MB / 4.22GB",
+      "pids": 9
+    }
+  },
+  "note": "Full run followed same-database smoke; storage rowCount includes smoke rows while fullRunCount isolates the measured run."
+}

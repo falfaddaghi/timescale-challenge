@@ -1,0 +1,111 @@
+{
+  "runId": "clickhouse-full-1m-500lps-30s-20260810",
+  "engine": "clickhouse",
+  "composeProject": "timescale-challenge-clickhouse-full",
+  "apiContainer": "timescale-challenge-clickhouse-full-api-1",
+  "clickhouseContainer": "timescale-challenge-clickhouse-full-clickhouse-1",
+  "hostUrl": "http://127.0.0.1:18082",
+  "clickhouseHttpHostPort": 18182,
+  "clickhouseNativeHostPort": 19182,
+  "smokeArtifact": "benchmarks/results/log-benchmark-20260809214154737-clickhouse-smoke-20260810.json",
+  "benchmarkArtifact": "benchmarks/results/log-benchmark-20260809214206634-clickhouse-full-1m-500lps-30s-20260810.json",
+  "protocol": {
+    "seedRows": 1000000,
+    "batchSize": 500,
+    "rate": 500,
+    "durationSec": 30,
+    "seed": 20260720,
+    "bucket": "1m",
+    "sampleIntervalMs": 1000,
+    "maxInFlight": 256,
+    "baseAgeMs": 600000,
+    "timestampSpanMs": 60000
+  },
+  "correctness": {
+    "status": "passed",
+    "failures": 0,
+    "seedAcceptedRows": 1000000,
+    "streamAcceptedRows": 15000,
+    "totalAcceptedRows": 1015000,
+    "seedRejectedRows": 0,
+    "streamRejectedRows": 0,
+    "seedPersisted": true,
+    "samplesCorrect": true,
+    "finalPersisted": true,
+    "overall": true
+  },
+  "latencyMs": {
+    "ingest": {
+      "count": 2030,
+      "p50": 7.938,
+      "p95": 11.037,
+      "p99": 15.137
+    },
+    "aggregate": {
+      "count": 32,
+      "p50": 87.03,
+      "p95": 99.882,
+      "p99": 102.319
+    }
+  },
+  "elapsedMs": {
+    "seed": 17723.064,
+    "stream": 30005.088,
+    "total": 47957.191
+  },
+  "throughput": {
+    "seedAcceptedLogsPerSecond": 56435.606,
+    "streamAcceptedLogsPerSecond": 500.009,
+    "streamScheduledLogsPerSecond": 500,
+    "streamActualDispatchLogsPerSecond": 500.004,
+    "totalAcceptedLogsPerSecond": 21164.721
+  },
+  "database": {
+    "rowCount": 1025500,
+    "fullRunCount": 1015000,
+    "fullRunSeedCount": 1000000,
+    "activeParts": 4,
+    "tableBytesOnDisk": 24780277,
+    "tableBytesReadable": "23.63 MiB",
+    "clickhouseDataVolumeBytes": 563471100,
+    "timedAggregate": {
+      "query": "1m service grouping with run_id and phase=seed filters",
+      "rows": 16,
+      "total": 1000000,
+      "clickhouseClientSeconds": 0.049,
+      "elapsedMs": 49
+    },
+    "explain": [
+      "ReadFromMergeTree (logs.logs)",
+      "MinMax index on timestamp: Parts 4/4, Granules 127/127",
+      "Partition index on toYYYYMM(timestamp): Parts 4/4, Granules 127/127",
+      "PrimaryKey index on timestamp: Parts 4/4, Granules 127/127"
+    ]
+  },
+  "containerStatsSnapshot": {
+    "api": {
+      "cpuPercent": 0,
+      "memory": "60.96MiB / 125GiB",
+      "memoryPercent": 0.05,
+      "networkIo": "239MB / 428MB",
+      "blockIo": "75.5MB / 0B",
+      "pids": 11,
+      "restartCount": 0
+    },
+    "clickhouse": {
+      "cpuPercent": 2.26,
+      "memory": "397.8MiB / 125GiB",
+      "memoryPercent": 0.31,
+      "networkIo": "427MB / 2.28MB",
+      "blockIo": "514MB / 736MB",
+      "pids": 735,
+      "restartCount": 0
+    }
+  },
+  "commands": {
+    "composeUp": "API_HOST_PORT=18082 CLICKHOUSE_HTTP_PORT=18182 CLICKHOUSE_NATIVE_PORT=19182 docker compose -p timescale-challenge-clickhouse-full -f compose.clickhouse.yml up -d --build",
+    "smoke": "node benchmarks/bench.mjs --smoke --url http://127.0.0.1:18082 --engine clickhouse --run-id clickhouse-smoke-20260810",
+    "full": "node benchmarks/bench.mjs --url http://127.0.0.1:18082 --engine clickhouse --rows 1000000 --batch-size 500 --duration 30 --rate 500 --seed 20260720 --sample-interval-ms 1000 --bucket 1m --max-in-flight 256 --base-age-ms 600000 --timestamp-span-ms 60000 --timeout-ms 30000 --health-timeout-ms 30000 --run-id clickhouse-full-1m-500lps-30s-20260810 --output-dir benchmarks/results",
+    "composeDown": "docker compose -p timescale-challenge-clickhouse-full -f compose.clickhouse.yml down -v"
+  }
+}

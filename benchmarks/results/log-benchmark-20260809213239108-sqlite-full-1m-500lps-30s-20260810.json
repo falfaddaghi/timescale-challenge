@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "log-service-http",
+  "status": "passed",
+  "startedAt": "2026-08-09T21:32:39.108Z",
+  "endedAt": "2026-08-09T21:37:54.657Z",
+  "engine": "sqlite",
+  "config": {
+    "targetUrl": "http://127.0.0.1:18081",
+    "apiPort": null,
+    "engine": "sqlite",
+    "seedRows": 1000000,
+    "batchSize": 500,
+    "durationSec": 30,
+    "rate": 500,
+    "seed": 20260720,
+    "runId": "sqlite-full-1m-500lps-30s-20260810",
+    "bucket": "1m",
+    "aggregateQuery": {
+      "endpoint": "/logs/aggregate",
+      "bucket": "1m",
+      "groupBy": "service",
+      "sampledFilters": [
+        "attr.run_id",
+        "attr.phase=seed"
+      ],
+      "finalFilters": [
+        "attr.run_id"
+      ]
+    },
+    "sampleIntervalMs": 1000,
+    "timeoutMs": 30000,
+    "maxInFlight": 256,
+    "baseTimestamp": "2026-08-09T21:22:39.108Z",
+    "timestampSpanMs": 60000,
+    "smoke": false,
+    "retentionProbeRequested": false,
+    "expectedRows": {
+      "seedAccepted": 1000000,
+      "allAccepted": 1015000
+    }
+  },
+  "machine": {
+    "hostname": "pop-os",
+    "platform": "linux",
+    "release": "6.17.9-76061709-generic",
+    "arch": "x64",
+    "node": "v24.13.1",
+    "cpuCount": 24,
+    "cpuModel": "AMD Ryzen 9 7900X3D 12-Core Processor",
+    "cpuSpeedMHz": 4764,
+    "memoryTotalBytes": 134225956864,
+    "memoryFreeBytesAtStart": 9972981760,
+    "loadAverageAtStart": [
+      4.32,
+      4.81,
+      5.18
+    ]
+  },
+  "phases": {
+    "seed": {
+      "requests": 2000,
+      "attemptedRows": 1000000,
+      "acceptedRows": 1000000,
+      "rejectedRows": 0,
+      "failures": 0,
+      "durationMs": 211248.137,
+      "observedAcceptedRate": 4733.77,
+      "latencyMs": {
+        "count": 2000,
+        "minMs": 23.384,
+        "maxMs": 838.95,
+        "meanMs": 105.074,
+        "p50Ms": 76.826,
+        "p95Ms": 220.773,
+        "p99Ms": 251.026
+      },
+      "failureDetails": []
+    },
+    "stream": {
+      "requests": 30,
+      "attemptedRows": 15000,
+      "acceptedRows": 15000,
+      "rejectedRows": 0,
+      "failures": 0,
+      "durationMs": 65242.283,
+      "observedAcceptedRate": 229.912,
+      "latencyMs": {
+        "count": 30,
+        "minMs": 191.897,
+        "maxMs": 20246.708,
+        "meanMs": 11734.578,
+        "p50Ms": 13051.675,
+        "p95Ms": 19375.624,
+        "p99Ms": 20085.712
+      },
+      "failureDetails": []
+    },
+    "streamRateControl": {
+      "attemptedRows": 15000,
+      "scheduledDurationMs": 30000,
+      "dispatchStartToLastMs": 28999.582,
+      "scheduledRate": 500,
+      "actualDispatchWindowMs": 29999.582,
+      "actualDispatchRate": 500.007,
+      "maxDispatchLagMs": 0.482
+    },
+    "aggregateSamples": {
+      "count": 3,
+      "correct": 3,
+      "correctnessRate": 1,
+      "latencyMs": {
+        "count": 3,
+        "minMs": 19726.861,
+        "maxMs": 24536.48,
+        "meanMs": 21747.094,
+        "p50Ms": 20977.941,
+        "p95Ms": 24180.626,
+        "p99Ms": 24465.309
+      },
+      "failures": 0,
+      "failureDetails": [],
+      "results": [
+        {
+          "at": "2026-08-09T21:36:49.393Z",
+          "latencyMs": 19726.861,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 0.355
+        },
+        {
+          "at": "2026-08-09T21:37:13.930Z",
+          "latencyMs": 24536.48,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 19727.45
+        },
+        {
+          "at": "2026-08-09T21:37:34.908Z",
+          "latencyMs": 20977.941,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 44264.214
+        }
+      ]
+    }
+  },
+  "verification": {
+    "health": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 25.547
+    },
+    "seedAggregate": {
+      "label": "seed",
+      "latencyMs": 19265.206,
+      "ok": true,
+      "expectedTotal": 1000000,
+      "actualTotal": 1000000,
+      "missing": [],
+      "unexpected": [],
+      "mismatched": [],
+      "responseErrors": [],
+      "differenceCount": 0
+    },
+    "seedLogs": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 7.225,
+      "countReturned": 1,
+      "nextCursorType": "string",
+      "error": null
+    },
+    "finalAggregate": {
+      "label": "final",
+      "latencyMs": 19732.667,
+      "ok": true,
+      "expectedTotal": 1015000,
+      "actualTotal": 1015000,
+      "missing": [],
+      "unexpected": [],
+      "mismatched": [],
+      "responseErrors": [],
+      "differenceCount": 0
+    },
+    "finalLogs": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 13.789,
+      "countReturned": 1,
+      "nextCursorType": "string",
+      "error": null
+    }
+  },
+  "metrics": {
+    "failures": 0,
+    "failureDetails": [],
+    "ingestLatencyMs": {
+      "count": 2030,
+      "minMs": 23.384,
+      "maxMs": 20246.708,
+      "meanMs": 276.939,
+      "p50Ms": 100.898,
+      "p95Ms": 228.507,
+      "p99Ms": 8610.921
+    },
+    "aggregateLatencyMs": {
+      "count": 5,
+      "minMs": 19265.206,
+      "maxMs": 24536.48,
+      "meanMs": 20847.831,
+      "p50Ms": 19732.667,
+      "p95Ms": 23824.772,
+      "p99Ms": 24394.138
+    },
+    "ingest": {
+      "seedAcceptedRows": 1000000,
+      "streamAcceptedRows": 15000,
+      "totalAcceptedRows": 1015000,
+      "targetStreamRate": 500,
+      "observedStreamCompletionRate": 229.912,
+      "scheduledStreamRate": 500
+    }
+  },
+  "durationsMs": {
+    "health": 25.667,
+    "seed": 211253.887,
+    "seedVerification": 19276.429,
+    "stream": 65243.366,
+    "finalVerification": 19746.614,
+    "retention": 0.141,
+    "total": 315548.834
+  },
+  "retention": {
+    "status": "skipped",
+    "reason": "not requested"
+  },
+  "throughput": {
+    "targetStreamLogsPerSecond": 500,
+    "seedAcceptedLogsPerSecond": 4733.77,
+    "streamAcceptedLogsPerSecond": 229.912,
+    "streamPlannedLogsPerSecond": 500,
+    "streamDispatchLogsPerSecond": 500.007,
+    "totalAcceptedLogsPerSecond": 3216.618
+  },
+  "correctness": {
+    "seedPersisted": true,
+    "samplesCorrect": true,
+    "finalPersisted": true,
+    "overall": true
+  }
+}
