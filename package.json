@@ -1,0 +1,37 @@
+{
+  "name": "timescale-log-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A high-throughput structured log ingestion and query service backed by TimescaleDB.",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && mkdir -p dist/db/migrations && cp -R src/db/migrations/. dist/db/migrations/",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:migrate": "tsx src/db/migrate.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@clickhouse/client": "1.23.1",
+    "better-sqlite3": "12.6.2",
+    "fastify": "^5.4.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "@types/node": "^22.15.21",
+    "@types/pg": "^8.15.4",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "eslint": "^9.27.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1",
+    "vitest": "^3.1.3"
+  }
+}
