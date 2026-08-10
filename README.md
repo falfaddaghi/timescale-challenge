@@ -341,15 +341,17 @@ load averages from 3.17 to 5.37, starting free memory from roughly 8.3 to
 host workloads varied between runs; repeat the protocol on the deployment
 host before treating the numbers as capacity commitments.
 
-The comparison report and runtime evidence are checked in:
+The original three-engine report is retained for historical context; the
+four-engine report is the authoritative current comparison. Runtime evidence
+for each engine is checked in:
 
-- [generated comparison](benchmarks/results/comparison-full-1m-500lps-30s-20260810.md)
+- [historical initial three-engine comparison](benchmarks/results/comparison-full-1m-500lps-30s-20260810.md)
 - [Timescale benchmark](benchmarks/results/log-benchmark-20260809212554868-timescale-full-1m-500lps-30s-20260810.json)
 - [Timescale runtime and EXPLAIN](benchmarks/results/timescale-full-1m-500lps-30s-20260810.runtime.json), [EXPLAIN JSON](benchmarks/results/timescale-full-1m-500lps-30s-20260810.explain.json)
 - [SQLite benchmark and runtime](benchmarks/results/log-benchmark-20260809213239108-sqlite-full-1m-500lps-30s-20260810.json), [runtime evidence](benchmarks/results/sqlite-full-1m-500lps-30s-20260810.runtime.json)
 - [ClickHouse benchmark and runtime](benchmarks/results/log-benchmark-20260809214206634-clickhouse-full-1m-500lps-30s-20260810.json), [runtime evidence](benchmarks/results/clickhouse-full-1m-500lps-30s-20260810.runtime.json)
 - [DuckDB benchmark](benchmarks/results/log-benchmark-20260810073248301-duckdb-full-1m-500lps-30s-20260810.json), [runtime JSON](benchmarks/results/duckdb-full-1m-500lps-30s-20260810.runtime.json), [runtime report](benchmarks/results/duckdb-full-1m-500lps-30s-20260810.runtime.md)
-- [Four-engine comparison](benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.md), [comparison JSON](benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.json)
+- [authoritative current four-engine comparison](benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.md), [comparison JSON](benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.json)
 
 ### Reproduce the comparison
 
