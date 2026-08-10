@@ -183,16 +183,16 @@ const buildWhere = (filters: LogFilters): ClickHouseWhere => {
   return { text: clauses.length === 0 ? "1 = 1" : clauses.join(" AND "), parameters };
 };
 
-const bucketIntervalSeconds = (bucket: AggregateQuery["bucket"]): number => {
+const bucketIntervalMilliseconds = (bucket: AggregateQuery["bucket"]): number => {
   switch (bucket) {
     case "1m":
-      return 60;
+      return 60_000;
     case "5m":
-      return 5 * 60;
+      return 5 * 60_000;
     case "1h":
-      return 60 * 60;
+      return 60 * 60_000;
     case "1d":
-      return 24 * 60 * 60;
+      return 24 * 60 * 60_000;
     default:
       throw new Error("invalid aggregate bucket");
   }
@@ -370,14 +370,25 @@ export class ClickHouseLogStore implements LogStore {
 
   public async aggregateLogs(query: AggregateQuery): Promise<AggregateBucket[]> {
     const where = buildWhere(query.filters);
-    const interval = bucketIntervalSeconds(query.bucket);
+    const interval = bucketIntervalMilliseconds(query.bucket);
     const group = groupExpression(query.groupBy);
     const result = await this.client.query({
       query: `
         SELECT bucket AS "start", group_value AS "group", count() AS "count"
         FROM (
           SELECT
-            toStartOfInterval("timestamp", INTERVAL ${interval} SECOND) AS bucket,
+            fromUnixTimestamp64Milli(
+              (
+                intDiv(toUnixTimestamp64Milli("timestamp"), ${interval})
+                - if(
+                    toUnixTimestamp64Milli("timestamp") < 0
+                    AND modulo(toUnixTimestamp64Milli("timestamp"), ${interval}) != 0,
+                    1,
+                    0
+                  )
+              ) * ${interval},
+              'UTC'
+            ) AS bucket,
             ${group} AS group_value
           FROM "logs"
           WHERE ${where.text}

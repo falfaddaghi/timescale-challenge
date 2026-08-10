@@ -128,7 +128,8 @@ describe("ClickHouse LogStore", () => {
       { start: "2026-07-20T13:00:00.000Z", group: "auth", count: 4 },
       { start: "2026-07-20T13:05:00.000Z", group: "checkout", count: 2 },
     ]);
-    expect(client.queries[0]!.query).toContain("INTERVAL 300 SECOND");
+    expect(client.queries[0]!.query).toContain("toUnixTimestamp64Milli(\"timestamp\")");
+    expect(client.queries[0]!.query).toContain("300000");
     expect(client.queries[0]!.query).toContain('"service" AS group_value');
     expect(client.queries[0]!.query_params).toEqual({
       since_0: "2026-07-20 13:00:00.000",
@@ -159,6 +160,27 @@ describe("ClickHouse LogStore", () => {
 
     await store.configureRetention(7);
     expect(client.commands[1]!.query).toContain("toDateTime(\"timestamp\", 'UTC') + INTERVAL 7 DAY");
+  });
+
+  it("uses epoch-floor arithmetic for pre-epoch UTC buckets", async () => {
+    const client = new FakeClickHouseClient();
+    client.queuedRows.push([
+      { start: "1969-12-31 23:00:00.000", group: null, count: 1 },
+    ]);
+    const store = new ClickHouseLogStore({ client });
+
+    await expect(store.aggregateLogs({
+      filters: {
+        attributes: {},
+        since: "1969-12-31T23:00:00.000Z",
+        until: "1970-01-01T00:00:00.000Z",
+      },
+      bucket: "1h",
+    })).resolves.toEqual([
+      { start: "1969-12-31T23:00:00.000Z", group: null, count: 1 },
+    ]);
+    expect(client.queries[0]!.query).toContain("intDiv(toUnixTimestamp64Milli(\"timestamp\"), 3600000)");
+    expect(client.queries[0]!.query).toContain("modulo(toUnixTimestamp64Milli(\"timestamp\"), 3600000)");
   });
 
   it("runs migration and readiness through the injected client seam", async () => {
