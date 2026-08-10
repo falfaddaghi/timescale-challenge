@@ -215,6 +215,9 @@ function runtimeSummary(runtime, explain, runtimePath, explainPath) {
   if (!runtime && !explain) return null;
   const database = runtime?.database ?? {};
   const aggregate = database.aggregate ?? database.timedAggregate ?? {};
+  const directResult = runtime?.checkpoint?.directResult ?? {};
+  const directAggregate = Array.isArray(directResult.aggregate) ? directResult.aggregate : [];
+  const directAggregateTotal = directAggregate.reduce((sum, bucket) => sum + Number(bucket.count ?? 0), 0);
   const stats = runtime?.containerStatsSnapshot ?? {};
   const files = database.files ?? runtime?.databaseFiles?.afterCheckpoint ?? {};
   const storageReadable = database.hypertableSizeReadable ?? database.tableBytesReadable;
@@ -230,14 +233,14 @@ function runtimeSummary(runtime, explain, runtimePath, explainPath) {
     composeProject: runtime?.composeProject ?? null,
     hostUrl: runtime?.hostUrl ?? null,
     smokeArtifact: runtime?.smokeArtifact ?? null,
-    storedRows: firstNumber(database.rowCount),
-    measuredRunRows: firstNumber(database.fullRunCount, runtime?.correctness?.totalAcceptedRows),
-    measuredSeedRows: firstNumber(database.fullRunSeedCount, runtime?.correctness?.seedAcceptedRows),
+    storedRows: firstNumber(database.rowCount, directResult.counts?.[0]?.total_rows, directResult.afterCheckpoint?.[0]?.total_rows),
+    measuredRunRows: firstNumber(database.fullRunCount, runtime?.correctness?.totalAcceptedRows, runtime?.apiAggregate?.total),
+    measuredSeedRows: firstNumber(database.fullRunSeedCount, runtime?.correctness?.seedAcceptedRows, directAggregateTotal || null),
     storageBytes,
     storageReadable: storageReadable ?? formatBytes(storageBytes),
-    aggregateElapsedMs: firstNumber(aggregate.elapsedMs, aggregate.clickhouseClientSeconds === undefined ? null : Number(aggregate.clickhouseClientSeconds) * 1_000),
-    aggregateRows: firstNumber(aggregate.rows),
-    aggregateTotal: firstNumber(aggregate.total),
+    aggregateElapsedMs: firstNumber(aggregate.elapsedMs, aggregate.clickhouseClientSeconds === undefined ? null : Number(aggregate.clickhouseClientSeconds) * 1_000, directResult.aggregateElapsedMs),
+    aggregateRows: firstNumber(aggregate.rows, directAggregate.length || null, runtime?.apiAggregate?.buckets?.length || null),
+    aggregateTotal: firstNumber(aggregate.total, directAggregateTotal || null, runtime?.apiAggregate?.total),
     runtimeStats: stats,
     explain: explain
       ? {
@@ -703,6 +706,20 @@ function selfCheck() {
   const duckdbComparison = comparableDifferences([row, duckdb]);
   if (!duckdbComparison.compatible || duckdb.comparisonStatus !== "COMPARABLE") fail("duckdb compatibility check failed");
   if (!markdownReport([row, duckdb], duckdbComparison).includes("duckdb")) fail("duckdb markdown rendering check failed");
+  const duckdbRuntime = runtimeSummary({
+    databaseFiles: { afterCheckpoint: { "logs.duckdb": 317730816 } },
+    apiAggregate: { total: 1015000, buckets: Array.from({ length: 16 }, () => ({ count: 1 })) },
+    checkpoint: {
+      directResult: {
+        counts: [{ total_rows: 1025500 }],
+        aggregate: [{ count: 1000000 }],
+        aggregateElapsedMs: 94.66,
+      },
+    },
+  }, null, "duckdb.runtime.json", null);
+  if (duckdbRuntime.storedRows !== 1025500 || duckdbRuntime.measuredRunRows !== 1015000 || duckdbRuntime.aggregateElapsedMs !== 94.66 || duckdbRuntime.aggregateRows !== 1 || duckdbRuntime.aggregateTotal !== 1000000) {
+    fail("duckdb runtime extraction check failed");
+  }
   const failed = flattenArtifact({
     status: "failed",
     engine: "clickhouse",

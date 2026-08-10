@@ -7,8 +7,8 @@ labels are explicit and may be `timescaledb`/`timescale`, `sqlite`,
 `clickhouse`, or `duckdb` (the comparator remains engine-neutral).
 
 Every run requires an explicit `--engine` label. This prevents a result from
-being silently misidentified when comparing TimescaleDB, SQLite, and
-ClickHouse runs.
+being silently misidentified when comparing TimescaleDB, SQLite, ClickHouse,
+and DuckDB runs.
 
 Node.js 20 or newer is required (`fetch()` and `AbortSignal.timeout()` are
 used, matching the repository engine requirement). The local checks run
@@ -272,10 +272,10 @@ node benchmarks/compare.mjs \
 node benchmarks/compare.mjs --dir benchmarks/results --format json
 ```
 
-Label each run with `--engine timescaledb`, `--engine sqlite`, or
-`--engine clickhouse`. Comparisons are meaningful only when row counts, batch
-size, rate, duration, bucket/filter shape, and machine configuration are
-matched. By default, the comparison refuses to render if any artifact has a
+Label each run with `--engine timescaledb`, `--engine sqlite`,
+`--engine clickhouse`, or `--engine duckdb`. Comparisons are meaningful only
+when row counts, batch size, rate, duration, bucket/filter shape, and machine
+configuration are matched. By default, the comparison refuses to render if any artifact has a
 missing/unknown engine, failed correctness, nonzero failures, or a mismatched
 seed/rate/duration/query signature. For diagnostic output only, explicitly
 request a flagged report:
@@ -300,6 +300,12 @@ preserved at:
 
 It was generated with explicit artifact paths and without
 `--allow-incomparable`; the report records `COMPARABLE` with no warnings.
+Smoke artifacts are deliberately not comparison inputs; the report uses only
+the four full-run artifacts listed in its JSON `rows`.
+
+The older `comparison-full-1m-500lps-30s-20260810.{md,json}` report remains a
+historical three-engine TimescaleDB/SQLite/ClickHouse comparison. Use the
+`*-four-engines-*` report above for the authoritative result including DuckDB.
 
 Comparison reports also include a separate workload-spec gate: for the
 standard full run, dispatch and accepted completion must each stay within 1%
