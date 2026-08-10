@@ -2,9 +2,9 @@
 
 This service accepts structured application logs, stores them behind a small
 adapter contract, and exposes filtering, cursor pagination, and time-bucketed
-aggregation. The production/default backend is TimescaleDB. SQLite and
-ClickHouse implementations use the same HTTP API and are useful for local
-development and engine comparisons.
+aggregation. The production/default backend is TimescaleDB. SQLite,
+ClickHouse, and DuckDB implementations use the same HTTP API and are useful
+for local development and engine comparisons.
 
 ## Quick start
 
@@ -31,14 +31,17 @@ docker compose -f compose.sqlite.yml up --build
 
 # ClickHouse, with the HTTP API on its own internal network (host port 8082)
 docker compose -f compose.clickhouse.yml up --build
+
+# DuckDB, with an embedded database file in the duckdb-data volume (host port 8083)
+docker compose -f compose.duckdb.yml up --build
 ```
 
 The TimescaleDB compose file defaults to host port 8080; the SQLite and
-ClickHouse variants default to 8081 and 8082 respectively. Every API
-container still listens on port 8080 by default. Set `API_HOST_PORT` when
-running more than one variant at once. The backend is selected with
-`DB_ENGINE=timescale|sqlite|clickhouse`; `timescaledb` remains accepted as a
-compatibility alias.
+ClickHouse variants default to 8081 and 8082, and DuckDB defaults to 8083.
+Every API container still listens on port 8080 by default. Set
+`API_HOST_PORT` when running more than one variant at once. The backend is
+selected with `DB_ENGINE=timescale|sqlite|clickhouse|duckdb`; `timescaledb`
+remains accepted as a compatibility alias.
 
 As an environment audit note, ClickHouse was identified as the likely
 forgotten local time-series database (not certain): multiple cached
@@ -56,6 +59,10 @@ npm run build
 # The migration command uses DB_ENGINE and the same URLs as the server.
 DB_ENGINE=sqlite SQLITE_PATH=./data/logs.sqlite npm run db:migrate
 DB_ENGINE=sqlite SQLITE_PATH=./data/logs.sqlite API_PORT=8080 npm start
+
+# DuckDB uses the same migration and server entry points.
+DB_ENGINE=duckdb DUCKDB_PATH=./data/logs.duckdb npm run db:migrate
+DB_ENGINE=duckdb DUCKDB_PATH=./data/logs.duckdb API_PORT=8080 npm start
 ```
 
 ## API contract
@@ -177,7 +184,7 @@ docker compose exec timescaledb psql -U postgres -d logs -c \
 The service query builder emits the equivalent parameterized predicates; the
 literal command above is only an operator inspection query.
 
-### SQLite and ClickHouse
+### SQLite, ClickHouse, and DuckDB
 
 SQLite stores both the original JSON attributes and a normalized string-valued
 `attribute_values` JSON object. It uses WAL mode, covering time/service/level
@@ -188,6 +195,33 @@ ClickHouse stores JSON plus normalized attribute values in a UTC MergeTree
 partitioned by month and ordered by `(timestamp, id)`. Its migration is
 `migrations/clickhouse/001_logs.sql`; parameterized ClickHouse query settings
 are used for filters and cursor values.
+
+DuckDB is an embedded, file-backed adapter using the official
+`@duckdb/node-api` package pinned to `1.5.5-r.3`. Its migration creates a typed
+`logs` table with UUID, `TIMESTAMPTZ`, scalar dimensions, original JSON
+`attributes`, normalized string-valued `attribute_values`, and `created_at`.
+Timestamp/id, service/timestamp/id, and level/timestamp/id indexes support the
+ordered query paths. Attribute filters use parameterized `json_each`/
+`json_extract_string` predicates; message search uses a parameterized literal
+`contains(lower(message), lower(?))`; aggregates use an epoch-anchored
+`time_bucket` with allowlisted bucket and group expressions. User-controlled
+values remain bound parameters.
+
+This adapter deliberately runs one API process against one DuckDB file. The
+[official DuckDB concurrency model](https://duckdb.org/docs/current/connect/concurrency)
+supports concurrent readers/writers within a single process, but read/write
+access to a native database file from multiple API processes is not the stable
+deployment model; file locks are part of the contract. Do not mount the same
+read-write `.duckdb` file into multiple API replicas. The runtime probe had to
+stop only the isolated API to release that file lock before direct SQL,
+`EXPLAIN`, and `CHECKPOINT` inspection; this was an operational constraint,
+not a correctness failure.
+
+Primary references for the implementation are the
+[DuckDB Node.js (Neo) client guide](https://duckdb.org/docs/lts/clients/node_neo/overview),
+the [`@duckdb/node-api` package](https://www.npmjs.com/package/@duckdb/node-api),
+the [DuckDB Node client source](https://github.com/duckdb/duckdb-node), and the
+[`CHECKPOINT` statement](https://duckdb.org/docs/current/sql/statements/checkpoint).
 
 ## Retention and readiness
 
@@ -201,19 +235,23 @@ chunk. SQLite performs its delete in the background worker. ClickHouse uses
 an asynchronous `ALTER TABLE ... DELETE` mutation after counting the affected
 rows. Cleanup is never awaited by ingestion requests; ClickHouse mutations
 and chunk drops are therefore eventually consistent with respect to the
-retention cutoff.
+retention cutoff. DuckDB has no native background TTL in this adapter: the
+same `RetentionWorker` issues a bounded `DELETE` in the API process, and
+`CHECKPOINT` is the explicit mechanism used to synchronize the WAL during
+maintenance/probing.
 
 Relevant configuration:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `DB_ENGINE` | `timescale` | `timescale`, `sqlite`, or `clickhouse` |
+| `DB_ENGINE` | `timescale` | `timescale`, `sqlite`, `clickhouse`, or `duckdb` |
 | `DATABASE_URL` | Timescale service URL | backend URL when one URL is sufficient |
 | `API_HOST` | `0.0.0.0` | bind address |
 | `API_PORT` | `8080` | port inside the API container |
-| `API_HOST_PORT` | `8080` (Timescale; 8081/8082 in alternate files) | host port used by compose files |
+| `API_HOST_PORT` | `8080` (Timescale; 8081/8082/8083 in alternate files) | host port used by compose files |
 | `TIMESCALE_HOST_PORT` | `5432` | optional host port for the Timescale service |
 | `SQLITE_PATH` | `/data/logs.sqlite` | SQLite database path |
+| `DUCKDB_PATH` | `/data/logs.duckdb` | DuckDB database path |
 | `CLICKHOUSE_URL` | `http://clickhouse:8123` | ClickHouse HTTP endpoint |
 | `CLICKHOUSE_DATABASE` | URL path or unset | ClickHouse database |
 | `RETENTION_DAYS` | `7` | retention window |
@@ -223,7 +261,7 @@ Relevant configuration:
 ## Benchmarking
 
 The benchmark harness never starts or stops the service. The authoritative
-comparison was run with the same protocol for all three adapters:
+comparison was run with the same protocol for all four adapters:
 
 | Setting | Value |
 | --- | --- |
@@ -247,12 +285,14 @@ PASS. Dispatch rate alone is not sufficient.
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | TimescaleDB | PASS | 500.008 | 499.991 | 321.588 ms | 121.303 ms | 118.494 s | 591 MB hypertable |
 | ClickHouse | PASS | 500.004 | 500.009 | **99.999 ms** | **10.949 ms** | **47.957 s** | **23.63 MiB table** |
+| DuckDB | PASS | 500.002 | 498.750 | **99.792 ms** | 428.844 ms | 812.998 s | 303.01 MiB database |
 | SQLite | **FAIL** | 500.007 | **229.912** | **24,180.626 ms** | 220.773 ms | 315.549 s | 829.74 MiB files |
 
-All three runs accepted exactly 1,000,000 seed rows plus 15,000 stream rows,
+All four runs accepted exactly 1,000,000 seed rows plus 15,000 stream rows,
 reported zero request failures/rejections, and passed exact seed/final
-aggregate persistence checks. SQLite is therefore functionally correct but
-does not meet the 500 logs/s or sub-second aggregate scale gates.
+aggregate persistence checks. DuckDB therefore passes the workload spec gate.
+SQLite is functionally correct but does not meet the 500 logs/s or sub-second
+aggregate scale gates.
 
 ClickHouse is the measured winner: its aggregate p95 is 0.311x TimescaleDB
 (69% lower), seed throughput is 4.959x, and total elapsed time is 0.405x
@@ -262,6 +302,14 @@ chunk retention, and a comfortable 321.588 ms aggregate p95 while sustaining
 the target. SQLite is a useful single-file/local fallback, not a production
 choice for this workload: its completion rate is 0.46x TimescaleDB and its
 aggregate p95 is 75.191x slower.
+
+DuckDB's raw aggregate p95 is 99.792 ms versus ClickHouse's 99.999 ms, a
+0.207 ms difference treated as effectively tied/noise without repeated runs.
+That near-tie does not change the whole-workload result: ClickHouse completed
+the run in 47.957 s versus DuckDB's 812.998 s, with seed throughput of
+56,435.606 versus 1,277.783 logs/s and primary storage of 23.63 MiB versus
+303.01 MiB. The comparison ratios are DuckDB/ClickHouse: 0.998x aggregate
+p95, 16.953x total elapsed, 0.023x seed throughput, and 12.822x storage.
 
 The measured rows and stored rows intentionally differ. Each full run followed
 a smoke run against the same database. The smoke run contributes 10,500 rows,
@@ -280,7 +328,10 @@ SQLite used a WAL-backed file and an index-assisted timestamp range, but its
 JSON attribute scans and temporary GROUP BY B-tree drove a 19,990.671 ms
 timed aggregate. ClickHouse's TTL and mutations are asynchronous; Timescale
 chunk policies are operationally richer; SQLite is simplest to run but has
-single-file write/read contention.
+single-file write/read contention. DuckDB's embedded file keeps deployment
+simple and has strong analytical execution, but its one-process write/file-lock
+boundary and much slower 1M-row seed phase make it a local analytical fallback,
+not the production default for this ingestion workload.
 
 These are directional measurements, not isolated hardware guarantees. All
 runs were on the current `pop-os` host (Linux 6.17.9, AMD Ryzen 9 7900X3D,
@@ -297,6 +348,8 @@ The comparison report and runtime evidence are checked in:
 - [Timescale runtime and EXPLAIN](benchmarks/results/timescale-full-1m-500lps-30s-20260810.runtime.json), [EXPLAIN JSON](benchmarks/results/timescale-full-1m-500lps-30s-20260810.explain.json)
 - [SQLite benchmark and runtime](benchmarks/results/log-benchmark-20260809213239108-sqlite-full-1m-500lps-30s-20260810.json), [runtime evidence](benchmarks/results/sqlite-full-1m-500lps-30s-20260810.runtime.json)
 - [ClickHouse benchmark and runtime](benchmarks/results/log-benchmark-20260809214206634-clickhouse-full-1m-500lps-30s-20260810.json), [runtime evidence](benchmarks/results/clickhouse-full-1m-500lps-30s-20260810.runtime.json)
+- [DuckDB benchmark](benchmarks/results/log-benchmark-20260810073248301-duckdb-full-1m-500lps-30s-20260810.json), [runtime JSON](benchmarks/results/duckdb-full-1m-500lps-30s-20260810.runtime.json), [runtime report](benchmarks/results/duckdb-full-1m-500lps-30s-20260810.runtime.md)
+- [Four-engine comparison](benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.md), [comparison JSON](benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.json)
 
 ### Reproduce the comparison
 
@@ -346,12 +399,27 @@ node benchmarks/bench.mjs --url http://127.0.0.1:18082 \
 docker compose -p timescale-challenge-clickhouse-full \
   -f compose.clickhouse.yml down -v
 
-# Compare only the three full artifacts, not smoke artifacts.
+# DuckDB embedded comparison
+API_HOST_PORT=18083 docker compose -p timescale-duckdb-full-20260810 \
+  -f compose.duckdb.yml up -d --build
+node benchmarks/bench.mjs --smoke --url http://127.0.0.1:18083 \
+  --engine duckdb --run-id duckdb-smoke-20260810
+node benchmarks/bench.mjs --url http://127.0.0.1:18083 \
+  --engine duckdb --rows 1000000 --batch-size 500 --duration 30 --rate 500 \
+  --seed 20260720 --sample-interval-ms 1000 --bucket 1m --max-in-flight 256 \
+  --base-age-ms 600000 --timestamp-span-ms 60000 --timeout-ms 30000 \
+  --health-timeout-ms 30000 --run-id duckdb-full-1m-500lps-30s-20260810 \
+  --output-dir benchmarks/results
+docker compose -p timescale-duckdb-full-20260810 \
+  -f compose.duckdb.yml down -v --remove-orphans
+
+# Compare the four full artifacts, not smoke artifacts.
 node benchmarks/compare.mjs \
   benchmarks/results/log-benchmark-20260809212554868-timescale-full-1m-500lps-30s-20260810.json \
   benchmarks/results/log-benchmark-20260809213239108-sqlite-full-1m-500lps-30s-20260810.json \
   benchmarks/results/log-benchmark-20260809214206634-clickhouse-full-1m-500lps-30s-20260810.json \
-  --format markdown --output benchmarks/results/comparison.md
+  benchmarks/results/log-benchmark-20260810073248301-duckdb-full-1m-500lps-30s-20260810.json \
+  --format markdown --output benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.md
 ```
 
 Each run writes a timestamped JSON artifact under `benchmarks/results/` with
@@ -367,6 +435,10 @@ conditions can be audited.
   search or a query language.
 - ClickHouse retention is an asynchronous mutation and can lag the configured
   cutoff; Timescale chunk retention removes complete chunks first.
+- DuckDB is an embedded single-process/file-lock deployment; do not share one
+  read-write database file across API replicas. Its retention worker issues
+  deletes in-process and requires checkpoint/maintenance policy for file-size
+  reclamation.
 - Attribute keys are intentionally unbounded JSON keys. High-cardinality
   workloads should benchmark their own key distribution and may need a
   dedicated indexed attribute table.
