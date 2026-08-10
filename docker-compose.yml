@@ -1,6 +1,8 @@
 services:
   timescaledb:
     image: timescale/timescaledb:latest-pg16
+    labels:
+      load-generator.role: postgres
     environment:
       POSTGRES_DB: logs
       POSTGRES_USER: postgres
@@ -19,6 +21,9 @@ services:
   api:
     build:
       context: .
+    labels:
+      load-generator.role: application
+      load-generator.port: "8080"
     environment:
       API_HOST: 0.0.0.0
       API_PORT: ${API_PORT:-8080}
