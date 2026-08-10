@@ -2,7 +2,9 @@
 
 `bench.mjs` is a deterministic, engine-neutral load generator for the HTTP
 contract in the project specification. It uses only Node.js built-ins and
-does not start, stop, restart, or configure the service under test.
+does not start, stop, restart, or configure the service under test. Engine
+labels are explicit and may be `timescaledb`/`timescale`, `sqlite`,
+`clickhouse`, or `duckdb` (the comparator remains engine-neutral).
 
 Every run requires an explicit `--engine` label. This prevents a result from
 being silently misidentified when comparing TimescaleDB, SQLite, and
@@ -72,6 +74,9 @@ node benchmarks/bench.mjs --smoke --url http://127.0.0.1:8081 --engine sqlite
 
 # ClickHouse stack (compose.clickhouse.yml defaults to host API port 8082)
 node benchmarks/bench.mjs --smoke --url http://127.0.0.1:8082 --engine clickhouse
+
+# DuckDB stack (compose.duckdb.yml defaults to host API port 8083)
+node benchmarks/bench.mjs --smoke --url http://127.0.0.1:8083 --engine duckdb
 ```
 
 For an alternate/high API port, use either the complete URL or `--api-port`
@@ -86,6 +91,25 @@ The equivalent host-port override when starting any Compose variant is
 separately according to the normal project workflow. The alternate Compose
 files use 8081 for SQLite and 8082 for ClickHouse by default, while the API
 container continues to listen on 8080.
+
+The DuckDB implementation uses the same smoke/full contract on host API port
+8083. The benchmark does not start or stop the service itself:
+
+```sh
+API_HOST_PORT=8083 docker compose -p timescale-duckdb-bench \
+  -f compose.duckdb.yml up -d --build
+node benchmarks/bench.mjs --smoke \
+  --url http://127.0.0.1:8083 --engine duckdb \
+  --run-id duckdb-smoke-20260810
+node benchmarks/bench.mjs \
+  --url http://127.0.0.1:8083 --engine duckdb \
+  --rows 1000000 --batch-size 500 --duration 30 --rate 500 \
+  --seed 20260720 --sample-interval-ms 1000 --bucket 1m \
+  --run-id duckdb-full-1m-500lps-30s-20260810 \
+  --output-dir benchmarks/results
+API_HOST_PORT=8083 docker compose -p timescale-duckdb-bench \
+  -f compose.duckdb.yml down -v --remove-orphans
+```
 
 Smoke defaults are 10,000 seed rows, batches of 100, and a five-second stream
 at 100 logs/s. Any explicitly supplied option wins, for example
@@ -103,7 +127,7 @@ Useful options include:
 --bucket 1m|5m|1h|1d      aggregate bucket (default 1m)
 --sample-interval-ms N    aggregate sample cadence (default 1000)
 --max-in-flight N         stream POST concurrency (0 means unlimited)
---engine NAME             required artifact label, e.g. timescaledb/sqlite/clickhouse
+--engine NAME             required artifact label, e.g. timescaledb/sqlite/clickhouse/duckdb
 --api-port N              override the port in --url (`--port` alias)
 --run-id ID               explicit isolation key; otherwise unique per run
 --output-dir PATH         artifact directory
@@ -266,6 +290,16 @@ includes the reasons. Generated comparison JSON plus supplemental
 `.explain.json`/`.runtime.json` evidence in the same results directory is
 ignored on subsequent `--dir` scans. The report intentionally leaves missing
 measurements as `-` rather than treating them as zero.
+
+The authoritative four-engine full-run comparison (TimescaleDB, SQLite,
+ClickHouse, and DuckDB; seed=1,000,000, batch=500, 500 logs/s for 30s) is
+preserved at:
+
+- `benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.md`
+- `benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.json`
+
+It was generated with explicit artifact paths and without
+`--allow-incomparable`; the report records `COMPARABLE` with no warnings.
 
 Comparison reports also include a separate workload-spec gate: for the
 standard full run, dispatch and accepted completion must each stay within 1%

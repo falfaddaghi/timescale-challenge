@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "runId": "duckdb-full-1m-500lps-30s-20260810",
+  "engine": "duckdb",
+  "composeProject": "timescale-duckdb-full-20260810",
+  "hostUrl": "http://127.0.0.1:18083",
+  "apiContainer": "eed75ef21a28c7affe48b87f81fc1b50714181eb166a2caa40b446a02fd39644",
+  "image": "timescale-duckdb-full-20260810-api",
+  "benchmarkArtifact": "benchmarks/results/log-benchmark-20260810073248301-duckdb-full-1m-500lps-30s-20260810.json",
+  "smokeArtifact": "benchmarks/results/log-benchmark-20260810073218810-duckdb-smoke-20260810.json",
+  "protocol": {
+    "seedRows": 1000000,
+    "batchSize": 500,
+    "rate": 500,
+    "durationSec": 30,
+    "seed": 20260720,
+    "bucket": "1m",
+    "sampleIntervalMs": 1000,
+    "maxInFlight": 256,
+    "timestampSpanMs": 60000
+  },
+  "apiAggregate": {
+    "ok": true,
+    "status": 200,
+    "elapsedMs": 236.5,
+    "buckets": [
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-0",
+        "count": 24372
+      },
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-1",
+        "count": 24372
+      },
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-2",
+        "count": 24372
+      },
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-3",
+        "count": 24372
+      },
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-4",
+        "count": 24372
+      },
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-5",
+        "count": 24372
+      },
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-6",
+        "count": 24372
+      },
+      {
+        "start": "2026-08-10T07:21:00.000Z",
+        "group": "benchmark-7",
+        "count": 24371
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-0",
+        "count": 102503
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-1",
+        "count": 102503
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-2",
+        "count": 102503
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-3",
+        "count": 102503
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-4",
+        "count": 102503
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-5",
+        "count": 102503
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-6",
+        "count": 102503
+      },
+      {
+        "start": "2026-08-10T07:22:00.000Z",
+        "group": "benchmark-7",
+        "count": 102504
+      }
+    ],
+    "total": 1015000
+  },
+  "resources": {
+    "beforeStop": {
+      "BlockIO": "386MB / 1.03GB",
+      "CPUPerc": "0.00%",
+      "Container": "eed75ef21a28c7affe48b87f81fc1b50714181eb166a2caa40b446a02fd39644",
+      "ID": "eed75ef21a28",
+      "MemPerc": "0.22%",
+      "MemUsage": "281.9MiB / 125GiB",
+      "Name": "timescale-duckdb-full-20260810-api-1",
+      "NetIO": "234MB / 1.61MB",
+      "PIDs": "34"
+    },
+    "liveBeforeSecondProbe": {
+      "BlockIO": "17.6MB / 0B",
+      "CPUPerc": "0.00%",
+      "Container": "eed75ef21a28c7affe48b87f81fc1b50714181eb166a2caa40b446a02fd39644",
+      "ID": "eed75ef21a28",
+      "MemPerc": "0.02%",
+      "MemUsage": "31.36MiB / 125GiB",
+      "Name": "timescale-duckdb-full-20260810-api-1",
+      "NetIO": "3.38kB / 680B",
+      "PIDs": "34"
+    },
+    "afterRestart": {
+      "BlockIO": "8.21MB / 0B",
+      "CPUPerc": "0.11%",
+      "Container": "eed75ef21a28c7affe48b87f81fc1b50714181eb166a2caa40b446a02fd39644",
+      "ID": "eed75ef21a28",
+      "MemPerc": "0.03%",
+      "MemUsage": "43.91MiB / 125GiB",
+      "Name": "timescale-duckdb-full-20260810-api-1",
+      "NetIO": "564B / 614B",
+      "PIDs": "34"
+    }
+  },
+  "databaseFiles": {
+    "beforeCheckpoint": {
+      "logs.duckdb": 309866496,
+      "logs.duckdb.wal": 3330456
+    },
+    "liveBeforeSecondProbe": {
+      "logs.duckdb": 317730816
+    },
+    "afterCheckpoint": {
+      "logs.duckdb": 317730816
+    }
+  },
+  "checkpoint": {
+    "stop": {
+      "ok": true,
+      "stdout": "",
+      "stderr": " Container timescale-duckdb-full-20260810-api-1 Stopping \n Container timescale-duckdb-full-20260810-api-1 Stopped \n",
+      "error": null
+    },
+    "directCommand": "docker run --rm --volumes-from <api-container> <api-image> node --input-type=module -e <DuckDB SQL probe>",
+    "directResult": {
+      "ok": true,
+      "elapsedMs": 292.676,
+      "counts": [
+        {
+          "total_rows": 1025500
+        }
+      ],
+      "countElapsedMs": 6.585,
+      "aggregate": [
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-0",
+          "count": 24372
+        },
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-1",
+          "count": 24372
+        },
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-2",
+          "count": 24372
+        },
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-3",
+          "count": 24372
+        },
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-4",
+          "count": 24372
+        },
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-5",
+          "count": 24372
+        },
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-6",
+          "count": 24372
+        },
+        {
+          "start": "2026-08-10T07:21:00.000Z",
+          "group": "benchmark-7",
+          "count": 24371
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-0",
+          "count": 100628
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-1",
+          "count": 100628
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-2",
+          "count": 100628
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-3",
+          "count": 100628
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-4",
+          "count": 100628
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-5",
+          "count": 100628
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-6",
+          "count": 100628
+        },
+        {
+          "start": "2026-08-10T07:22:00.000Z",
+          "group": "benchmark-7",
+          "count": 100629
+        }
+      ],
+      "aggregateElapsedMs": 94.66,
+      "explain": [
+        {
+          "explain_key": "analyzed_plan",
+          "explain_value": "┌─────────────────────────────────────┐\n│┌───────────────────────────────────┐│\n││    Query Profiling Information    ││\n│└───────────────────────────────────┘│\n└─────────────────────────────────────┘\nEXPLAIN ANALYZE SELECT \"id\", \"timestamp\", \"level\", \"service\", \"message\", \"attributes\" FROM \"logs\" WHERE \"service\" = 'benchmark-0' AND \"timestamp\" >= CAST('2026-08-10T07:21:48.301Z' AS TIMESTAMPTZ) AND \"timestamp\" < CAST('2026-08-10T07:22:49.301Z' AS TIMESTAMPTZ) AND (EXISTS (SELECT 1 FROM json_each(\"logs\".\"attribute_values\") AS attribute WHERE attribute.key = 'run_id' AND json_extract_string(attribute.value, '$') = 'duckdb-full-1m-500lps-30s-20260810')) AND EXISTS (SELECT 1 FROM json_each(\"logs\".\"attribute_values\") AS phase WHERE phase.key = 'phase' AND json_extract_string(phase.value, '$') = 'seed') ORDER BY \"timestamp\" DESC, \"id\" DESC LIMIT 101\n┌────────────────────────────────────────────────┐\n│┌──────────────────────────────────────────────┐│\n││              Total Time: 0.0727s             ││\n│└──────────────────────────────────────────────┘│\n└────────────────────────────────────────────────┘\n┌───────────────────────────┐\n│           QUERY           │\n└─────────────┬─────────────┘\n┌─────────────┴─────────────┐\n│      EXPLAIN_ANALYZE      │\n│    ────────────────────   │\n│                           │\n│           0 rows          │\n│           0.00s           │\n└─────────────┬─────────────┘\n┌─────────────┴─────────────┐\n│           TOP_N           │\n│    ────────────────────   │\n│          Top: 101         │\n│                           │\n│         Order By:         │\n│ logs.main.logs.\"timestamp\"│\n│            DESC           │\n│   logs.main.logs.id DESC  │\n│                           │\n│                           │\n│                           │\n│          101 rows         │\n│           0.05s           │\n└─────────────┬─────────────┘\n┌─────────────┴─────────────┐\n│         PROJECTION        │\n│    ────────────────────   │\n│             id            │\n│         timestamp         │\n│           level           │\n│          service          │\n│          message          │\n│         attributes        │\n│                           │\n│                           │\n│                           │\n│        125,000 rows       │\n│           0.00s           │\n└─────────────┬─────────────┘\n┌─────────────┴─────────────┐\n│      LEFT_DELIM_JOIN      │\n│    ────────────────────   │\n│      Join Type: SEMI      │\n│                           │\n│        Conditions:        │\n│  attribute_values IS NOT  │\n│        DISTINCT FROM      │\n│      attribute_values     ├─────────────────────────────────────────────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────────────┐\n│                           │                                                                                                     │                                                         │\n│       Delim Index: 2      │                                                                                                     │                                                         │\n│                           │                                                                                                     │                                                         │\n│                           │                                                                                                     │                                                         │\n│                           │                                                                                                     │                                                         │\n│           0 rows          │                                                                                                     │                                                         │\n│           0.10s           │                                                                                                     │                                                         │\n└─────────────┬─────────────┘                                                                                                     │                                                         │\n┌─────────────┴─────────────┐                                                                                       ┌─────────────┴─────────────┐                             ┌─────────────┴─────────────┐\n│      LEFT_DELIM_JOIN      │                                                                                       │         HASH_JOIN         │                             │       HASH_GROUP_BY       │\n│    ────────────────────   │                                                                                       │    ────────────────────   │                             │    ────────────────────   │\n│      Join Type: SEMI      │                                                                                       │      Join Type: SEMI      │                             │         Groups: #2        │\n│                           │                                                                                       │                           │                             │                           │\n│        Conditions:        │                                                                                       │        Conditions:        │                             │                           │\n│  attribute_values IS NOT  │                                                                                       │  attribute_values IS NOT  │                             │                           │\n│        DISTINCT FROM      │                                                                                       │        DISTINCT FROM      │                             │                           │\n│      attribute_values     ├──────────────┬─────────────────────────────────────────────────────────┐              │      attribute_values     ├──────────────┐              │           0.00s           │\n│                           │              │                                                         │              │                           │              │              │                           │\n│       Delim Index: 1      │              │                                                         │              │                           │              │              │                           │\n│                           │              │                                                         │              │                           │              │              │                           │\n│                           │              │                                                         │              │                           │              │              │                           │\n│                           │              │                                                         │              │           0.02s           │              │              │                           │\n│           0 rows          │              │                                                         │              │        125,000 rows       │              │              │           2 rows          │\n│           0.01s           │              │                                                         │              │          (0.02s)          │              │              │          (0.00s)          │\n└─────────────┬─────────────┘              │                                                         │              └─────────────┬─────────────┘              │              └───────────────────────────┘\n┌─────────────┴─────────────┐┌─────────────┴─────────────┐                             ┌─────────────┴─────────────┐┌─────────────┴─────────────┐┌─────────────┴─────────────┐\n│         TABLE_SCAN        ││         HASH_JOIN         │                             │       HASH_GROUP_BY       ││      COLUMN_DATA_SCAN     ││         PROJECTION        │\n│    ────────────────────   ││    ────────────────────   │                             │    ────────────────────   ││                           ││    ────────────────────   │\n│   Table: logs.main.logs   ││      Join Type: SEMI      │                             │         Groups: #2        ││                           ││             #2            │\n│   Type: Sequential Scan   ││                           │                             │                           ││           0.00s           ││                           │\n│                           ││        Conditions:        │                             │                           ││                           ││                           │\n│        Projections:       ││  attribute_values IS NOT  │                             │                           ││                           ││                           │\n│          service          ││        DISTINCT FROM      │                             │                           ││                           ││                           │\n│         timestamp         ││      attribute_values     │                             │           0.00s           ││                           ││           0.00s           │\n│      attribute_values     ││                           │                             │                           ││                           ││                           │\n│             id            ││                           │                             │                           ││                           ││                           │\n│           level           ││                           │                             │                           ││                           ││                           │\n│          message          ││                           │                             │                           ││                           ││                           │\n│         attributes        ││           0.02s           │                             │                           ││                           ││                           │\n│                           ││                           ├──────────────┐              │                           ││                           ││                           │\n│          Filters:         ││                           │              │              │                           ││                           ││                           │\n│   service='benchmark-0'   ││                           │              │              │                           ││                           ││                           │\n│ timestamp>='2026-08-10 07 ││                           │              │              │                           ││                           ││                           │\n│ :21:48.301+00'::TIMESTAMP ││                           │              │              │                           ││                           ││                           │\n│     WITH TIME ZONE AND    ││                           │              │              │                           ││                           ││                           │\n│  timestamp<'2026-08-10 07 ││                           │              │              │                           ││                           ││                           │\n│ :22:49.301+00'::TIMESTAMP ││                           │              │              │                           ││                           ││                           │\n│       WITH TIME ZONE      ││                           │              │              │                           ││                           ││                           │\n│                           ││                           │              │              │                           ││                           ││                           │\n│                           ││                           │              │              │                           ││                           ││                           │\n│                           ││                           │              │              │                           ││                           ││                           │\n│        127,573 rows       ││        126,875 rows       │              │              │           4 rows          ││        126,875 rows       ││           1 row           │\n│           0.35s           ││          (0.02s)          │              │              │          (0.00s)          ││          (0.00s)          ││          (0.00s)          │\n└───────────────────────────┘└─────────────┬─────────────┘              │              └───────────────────────────┘└───────────────────────────┘└─────────────┬─────────────┘\n                             ┌─────────────┴─────────────┐┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\n                             │      COLUMN_DATA_SCAN     ││         PROJECTION        │                                                          │           FILTER          │\n                             │                           ││    ────────────────────   │                                                          │    ────────────────────   │\n                             │                           ││             #2            │                                                          │   ((key = 'phase') AND    │\n                             │           0.00s           ││                           │                                                          │ (json_extract_string(value│\n                             │                           ││                           │                                                          │     , '$') = 'seed'))     │\n                             │                           ││                           │                                                          │                           │\n                             │                           ││                           │                                                          │                           │\n                             │                           ││           0.00s           │                                                          │                           │\n                             │        127,573 rows       ││           2 rows          │                                                          │           1 row           │\n                             │          (0.00s)          ││          (0.00s)          │                                                          │           0.00s           │\n                             └───────────────────────────┘└─────────────┬─────────────┘                                                          └─────────────┬─────────────┘\n                                                          ┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\n                                                          │           FILTER          │                                                          │       INOUT_FUNCTION      │\n                                                          │    ────────────────────   │                                                          │    ────────────────────   │\n                                                          │   ((key = 'run_id') AND   │                                                          │      Name: json_each      │\n                                                          │ (json_extract_string(value│                                                          │                           │\n                                                          │  , '$') = 'duckdb-full-1m │                                                          │                           │\n                                                          │  -500lps-30s-20260810'))  │                                                          │                           │\n                                                          │                           │                                                          │                           │\n                                                          │                           │                                                          │           0.00s           │\n                                                          │                           │                                                          │                           │\n                                                          │           2 rows          │                                                          │           6 rows          │\n                                                          │           0.00s           │                                                          │          (0.00s)          │\n                                                          └─────────────┬─────────────┘                                                          └─────────────┬─────────────┘\n                                                          ┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\n                                                          │       INOUT_FUNCTION      │                                                          │         PROJECTION        │\n                                                          │    ────────────────────   │                                                          │    ────────────────────   │\n                                                          │      Name: json_each      │                                                          │      attribute_values     │\n                                                          │                           │                                                          │      attribute_values     │\n                                                          │                           │                                                          │                           │\n                                                          │                           │                                                          │                           │\n                                                          │                           │                                                          │                           │\n                                                          │           0.00s           │                                                          │           2 rows          │\n                                                          │          (0.00s)          │                                                          │           0.00s           │\n                                                          └─────────────┬─────────────┘                                                          └─────────────┬─────────────┘\n                                                          ┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\n                                                          │         PROJECTION        │                                                          │         DELIM_SCAN        │\n                                                          │    ────────────────────   │                                                          │    ────────────────────   │\n                                                          │      attribute_values     │                                                          │       Delim Index: 2      │\n                                                          │      attribute_values     │                                                          │                           │\n                                                          │                           │                                                          │                           │\n                                                          │                           │                                                          │                           │\n                                                          │                           │                                                          │                           │\n                                                          │           4 rows          │                                                          │           0.00s           │\n                                                          │           0.00s           │                                                          │          (0.00s)          │\n                                                          └─────────────┬─────────────┘                                                          └───────────────────────────┘\n                                                          ┌─────────────┴─────────────┐\n                                                          │         DELIM_SCAN        │\n                                                          │    ────────────────────   │\n                                                          │       Delim Index: 1      │\n                                                          │                           │\n                                                          │                           │\n                                                          │                           │\n                                                          │           0 rows          │\n                                                          │           0.00s           │\n                                                          └───────────────────────────┘\n"
+        }
+      ],
+      "explainElapsedMs": 76.08,
+      "checkpointElapsedMs": 0.344,
+      "afterCheckpoint": [
+        {
+          "total_rows": 1025500
+        }
+      ]
+    },
+    "stdout": "{\"ok\":true,\"elapsedMs\":292.676,\"counts\":[{\"total_rows\":1025500}],\"countElapsedMs\":6.585,\"aggregate\":[{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-0\",\"count\":24372},{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-1\",\"count\":24372},{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-2\",\"count\":24372},{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-3\",\"count\":24372},{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-4\",\"count\":24372},{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-5\",\"count\":24372},{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-6\",\"count\":24372},{\"start\":\"2026-08-10T07:21:00.000Z\",\"group\":\"benchmark-7\",\"count\":24371},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-0\",\"count\":100628},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-1\",\"count\":100628},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-2\",\"count\":100628},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-3\",\"count\":100628},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-4\",\"count\":100628},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-5\",\"count\":100628},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-6\",\"count\":100628},{\"start\":\"2026-08-10T07:22:00.000Z\",\"group\":\"benchmark-7\",\"count\":100629}],\"aggregateElapsedMs\":94.66,\"explain\":[{\"explain_key\":\"analyzed_plan\",\"explain_value\":\"┌─────────────────────────────────────┐\\n│┌───────────────────────────────────┐│\\n││    Query Profiling Information    ││\\n│└───────────────────────────────────┘│\\n└─────────────────────────────────────┘\\nEXPLAIN ANALYZE SELECT \\\"id\\\", \\\"timestamp\\\", \\\"level\\\", \\\"service\\\", \\\"message\\\", \\\"attributes\\\" FROM \\\"logs\\\" WHERE \\\"service\\\" = 'benchmark-0' AND \\\"timestamp\\\" >= CAST('2026-08-10T07:21:48.301Z' AS TIMESTAMPTZ) AND \\\"timestamp\\\" < CAST('2026-08-10T07:22:49.301Z' AS TIMESTAMPTZ) AND (EXISTS (SELECT 1 FROM json_each(\\\"logs\\\".\\\"attribute_values\\\") AS attribute WHERE attribute.key = 'run_id' AND json_extract_string(attribute.value, '$') = 'duckdb-full-1m-500lps-30s-20260810')) AND EXISTS (SELECT 1 FROM json_each(\\\"logs\\\".\\\"attribute_values\\\") AS phase WHERE phase.key = 'phase' AND json_extract_string(phase.value, '$') = 'seed') ORDER BY \\\"timestamp\\\" DESC, \\\"id\\\" DESC LIMIT 101\\n┌────────────────────────────────────────────────┐\\n│┌──────────────────────────────────────────────┐│\\n││              Total Time: 0.0727s             ││\\n│└──────────────────────────────────────────────┘│\\n└────────────────────────────────────────────────┘\\n┌───────────────────────────┐\\n│           QUERY           │\\n└─────────────┬─────────────┘\\n┌─────────────┴─────────────┐\\n│      EXPLAIN_ANALYZE      │\\n│    ────────────────────   │\\n│                           │\\n│           0 rows          │\\n│           0.00s           │\\n└─────────────┬─────────────┘\\n┌─────────────┴─────────────┐\\n│           TOP_N           │\\n│    ────────────────────   │\\n│          Top: 101         │\\n│                           │\\n│         Order By:         │\\n│ logs.main.logs.\\\"timestamp\\\"│\\n│            DESC           │\\n│   logs.main.logs.id DESC  │\\n│                           │\\n│                           │\\n│                           │\\n│          101 rows         │\\n│           0.05s           │\\n└─────────────┬─────────────┘\\n┌─────────────┴─────────────┐\\n│         PROJECTION        │\\n│    ────────────────────   │\\n│             id            │\\n│         timestamp         │\\n│           level           │\\n│          service          │\\n│          message          │\\n│         attributes        │\\n│                           │\\n│                           │\\n│                           │\\n│        125,000 rows       │\\n│           0.00s           │\\n└─────────────┬─────────────┘\\n┌─────────────┴─────────────┐\\n│      LEFT_DELIM_JOIN      │\\n│    ────────────────────   │\\n│      Join Type: SEMI      │\\n│                           │\\n│        Conditions:        │\\n│  attribute_values IS NOT  │\\n│        DISTINCT FROM      │\\n│      attribute_values     ├─────────────────────────────────────────────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────────────┐\\n│                           │                                                                                                     │                                                         │\\n│       Delim Index: 2      │                                                                                                     │                                                         │\\n│                           │                                                                                                     │                                                         │\\n│                           │                                                                                                     │                                                         │\\n│                           │                                                                                                     │                                                         │\\n│           0 rows          │                                                                                                     │                                                         │\\n│           0.10s           │                                                                                                     │                                                         │\\n└─────────────┬─────────────┘                                                                                                     │                                                         │\\n┌─────────────┴─────────────┐                                                                                       ┌─────────────┴─────────────┐                             ┌─────────────┴─────────────┐\\n│      LEFT_DELIM_JOIN      │                                                                                       │         HASH_JOIN         │                             │       HASH_GROUP_BY       │\\n│    ────────────────────   │                                                                                       │    ────────────────────   │                             │    ────────────────────   │\\n│      Join Type: SEMI      │                                                                                       │      Join Type: SEMI      │                             │         Groups: #2        │\\n│                           │                                                                                       │                           │                             │                           │\\n│        Conditions:        │                                                                                       │        Conditions:        │                             │                           │\\n│  attribute_values IS NOT  │                                                                                       │  attribute_values IS NOT  │                             │                           │\\n│        DISTINCT FROM      │                                                                                       │        DISTINCT FROM      │                             │                           │\\n│      attribute_values     ├──────────────┬─────────────────────────────────────────────────────────┐              │      attribute_values     ├──────────────┐              │           0.00s           │\\n│                           │              │                                                         │              │                           │              │              │                           │\\n│       Delim Index: 1      │              │                                                         │              │                           │              │              │                           │\\n│                           │              │                                                         │              │                           │              │              │                           │\\n│                           │              │                                                         │              │                           │              │              │                           │\\n│                           │              │                                                         │              │           0.02s           │              │              │                           │\\n│           0 rows          │              │                                                         │              │        125,000 rows       │              │              │           2 rows          │\\n│           0.01s           │              │                                                         │              │          (0.02s)          │              │              │          (0.00s)          │\\n└─────────────┬─────────────┘              │                                                         │              └─────────────┬─────────────┘              │              └───────────────────────────┘\\n┌─────────────┴─────────────┐┌─────────────┴─────────────┐                             ┌─────────────┴─────────────┐┌─────────────┴─────────────┐┌─────────────┴─────────────┐\\n│         TABLE_SCAN        ││         HASH_JOIN         │                             │       HASH_GROUP_BY       ││      COLUMN_DATA_SCAN     ││         PROJECTION        │\\n│    ────────────────────   ││    ────────────────────   │                             │    ────────────────────   ││                           ││    ────────────────────   │\\n│   Table: logs.main.logs   ││      Join Type: SEMI      │                             │         Groups: #2        ││                           ││             #2            │\\n│   Type: Sequential Scan   ││                           │                             │                           ││           0.00s           ││                           │\\n│                           ││        Conditions:        │                             │                           ││                           ││                           │\\n│        Projections:       ││  attribute_values IS NOT  │                             │                           ││                           ││                           │\\n│          service          ││        DISTINCT FROM      │                             │                           ││                           ││                           │\\n│         timestamp         ││      attribute_values     │                             │           0.00s           ││                           ││           0.00s           │\\n│      attribute_values     ││                           │                             │                           ││                           ││                           │\\n│             id            ││                           │                             │                           ││                           ││                           │\\n│           level           ││                           │                             │                           ││                           ││                           │\\n│          message          ││                           │                             │                           ││                           ││                           │\\n│         attributes        ││           0.02s           │                             │                           ││                           ││                           │\\n│                           ││                           ├──────────────┐              │                           ││                           ││                           │\\n│          Filters:         ││                           │              │              │                           ││                           ││                           │\\n│   service='benchmark-0'   ││                           │              │              │                           ││                           ││                           │\\n│ timestamp>='2026-08-10 07 ││                           │              │              │                           ││                           ││                           │\\n│ :21:48.301+00'::TIMESTAMP ││                           │              │              │                           ││                           ││                           │\\n│     WITH TIME ZONE AND    ││                           │              │              │                           ││                           ││                           │\\n│  timestamp<'2026-08-10 07 ││                           │              │              │                           ││                           ││                           │\\n│ :22:49.301+00'::TIMESTAMP ││                           │              │              │                           ││                           ││                           │\\n│       WITH TIME ZONE      ││                           │              │              │                           ││                           ││                           │\\n│                           ││                           │              │              │                           ││                           ││                           │\\n│                           ││                           │              │              │                           ││                           ││                           │\\n│                           ││                           │              │              │                           ││                           ││                           │\\n│        127,573 rows       ││        126,875 rows       │              │              │           4 rows          ││        126,875 rows       ││           1 row           │\\n│           0.35s           ││          (0.02s)          │              │              │          (0.00s)          ││          (0.00s)          ││          (0.00s)          │\\n└───────────────────────────┘└─────────────┬─────────────┘              │              └───────────────────────────┘└───────────────────────────┘└─────────────┬─────────────┘\\n                             ┌─────────────┴─────────────┐┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\\n                             │      COLUMN_DATA_SCAN     ││         PROJECTION        │                                                          │           FILTER          │\\n                             │                           ││    ────────────────────   │                                                          │    ────────────────────   │\\n                             │                           ││             #2            │                                                          │   ((key = 'phase') AND    │\\n                             │           0.00s           ││                           │                                                          │ (json_extract_string(value│\\n                             │                           ││                           │                                                          │     , '$') = 'seed'))     │\\n                             │                           ││                           │                                                          │                           │\\n                             │                           ││                           │                                                          │                           │\\n                             │                           ││           0.00s           │                                                          │                           │\\n                             │        127,573 rows       ││           2 rows          │                                                          │           1 row           │\\n                             │          (0.00s)          ││          (0.00s)          │                                                          │           0.00s           │\\n                             └───────────────────────────┘└─────────────┬─────────────┘                                                          └─────────────┬─────────────┘\\n                                                          ┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\\n                                                          │           FILTER          │                                                          │       INOUT_FUNCTION      │\\n                                                          │    ────────────────────   │                                                          │    ────────────────────   │\\n                                                          │   ((key = 'run_id') AND   │                                                          │      Name: json_each      │\\n                                                          │ (json_extract_string(value│                                                          │                           │\\n                                                          │  , '$') = 'duckdb-full-1m │                                                          │                           │\\n                                                          │  -500lps-30s-20260810'))  │                                                          │                           │\\n                                                          │                           │                                                          │                           │\\n                                                          │                           │                                                          │           0.00s           │\\n                                                          │                           │                                                          │                           │\\n                                                          │           2 rows          │                                                          │           6 rows          │\\n                                                          │           0.00s           │                                                          │          (0.00s)          │\\n                                                          └─────────────┬─────────────┘                                                          └─────────────┬─────────────┘\\n                                                          ┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\\n                                                          │       INOUT_FUNCTION      │                                                          │         PROJECTION        │\\n                                                          │    ────────────────────   │                                                          │    ────────────────────   │\\n                                                          │      Name: json_each      │                                                          │      attribute_values     │\\n                                                          │                           │                                                          │      attribute_values     │\\n                                                          │                           │                                                          │                           │\\n                                                          │                           │                                                          │                           │\\n                                                          │                           │                                                          │                           │\\n                                                          │           0.00s           │                                                          │           2 rows          │\\n                                                          │          (0.00s)          │                                                          │           0.00s           │\\n                                                          └─────────────┬─────────────┘                                                          └─────────────┬─────────────┘\\n                                                          ┌─────────────┴─────────────┐                                                          ┌─────────────┴─────────────┐\\n                                                          │         PROJECTION        │                                                          │         DELIM_SCAN        │\\n                                                          │    ────────────────────   │                                                          │    ────────────────────   │\\n                                                          │      attribute_values     │                                                          │       Delim Index: 2      │\\n                                                          │      attribute_values     │                                                          │                           │\\n                                                          │                           │                                                          │                           │\\n                                                          │                           │                                                          │                           │\\n                                                          │                           │                                                          │                           │\\n                                                          │           4 rows          │                                                          │           0.00s           │\\n                                                          │           0.00s           │                                                          │          (0.00s)          │\\n                                                          └─────────────┬─────────────┘                                                          └───────────────────────────┘\\n                                                          ┌─────────────┴─────────────┐\\n                                                          │         DELIM_SCAN        │\\n                                                          │    ────────────────────   │\\n                                                          │       Delim Index: 1      │\\n                                                          │                           │\\n                                                          │                           │\\n                                                          │                           │\\n                                                          │           0 rows          │\\n                                                          │           0.00s           │\\n                                                          └───────────────────────────┘\\n\"}],\"explainElapsedMs\":76.08,\"checkpointElapsedMs\":0.344,\"afterCheckpoint\":[{\"total_rows\":1025500}]}\n",
+    "stderr": null
+  },
+  "apiRestart": {
+    "start": {
+      "ok": true,
+      "stdout": "",
+      "stderr": " Container timescale-duckdb-full-20260810-api-1 Starting \n Container timescale-duckdb-full-20260810-api-1 Started \n",
+      "error": null
+    },
+    "health": {
+      "ok": true,
+      "status": 200,
+      "body": {
+        "status": "ok"
+      },
+      "elapsedMs": 13.907
+    }
+  },
+  "commands": {
+    "composeUp": "API_HOST_PORT=18083 docker compose -p timescale-duckdb-full-20260810 -f compose.duckdb.yml up -d --build",
+    "smoke": "node benchmarks/bench.mjs --smoke --url http://127.0.0.1:18083 --engine duckdb --run-id duckdb-smoke-20260810 --output-dir benchmarks/results",
+    "full": "node benchmarks/bench.mjs --url http://127.0.0.1:18083 --engine duckdb --rows 1000000 --batch-size 500 --duration 30 --rate 500 --seed 20260720 --sample-interval-ms 1000 --bucket 1m --max-in-flight 256 --base-age-ms 600000 --timestamp-span-ms 60000 --timeout-ms 30000 --health-timeout-ms 30000 --run-id duckdb-full-1m-500lps-30s-20260810 --output-dir benchmarks/results",
+    "composeDown": "API_HOST_PORT=18083 docker compose -p timescale-duckdb-full-20260810 -f compose.duckdb.yml down -v --remove-orphans"
+  }
+}

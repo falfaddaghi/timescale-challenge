@@ -8,7 +8,7 @@
  *   node benchmarks/compare.mjs a.json b.json --format json --output comparison.json
  *
  * The report intentionally reads the stable artifact fields rather than
- * knowing anything about TimescaleDB, SQLite, or ClickHouse internals.
+ * knowing anything about TimescaleDB, SQLite, ClickHouse, or DuckDB internals.
  */
 
 import { readFile, readdir, writeFile } from "node:fs/promises";
@@ -92,7 +92,7 @@ Options:
   --help
 
 Each artifact's engine label comes from artifact.engine or artifact.config.engine.
-Use --engine on bench.mjs to label TimescaleDB, SQLite, ClickHouse, etc.
+Use --engine on bench.mjs to label TimescaleDB, SQLite, ClickHouse, DuckDB, etc.
 `);
 }
 
@@ -192,12 +192,38 @@ function formatBytes(bytes) {
   return `${Number(amount.toFixed(2))} ${units[unit]}`;
 }
 
+function parseReadableBytes(input) {
+  if (typeof input !== "string") return null;
+  const match = input.trim().match(/^([0-9]+(?:\.[0-9]+)?)\s*(B|KB|MB|GB|KiB|MiB|GiB|TiB)$/i);
+  if (!match) return null;
+  const amount = Number(match[1]);
+  const unit = match[2].toLowerCase();
+  const multiplier = {
+    b: 1,
+    kb: 1_000,
+    mb: 1_000_000,
+    gb: 1_000_000_000,
+    kib: 1024,
+    mib: 1024 ** 2,
+    gib: 1024 ** 3,
+    tib: 1024 ** 4,
+  }[unit];
+  return multiplier ? amount * multiplier : null;
+}
+
 function runtimeSummary(runtime, explain, runtimePath, explainPath) {
   if (!runtime && !explain) return null;
   const database = runtime?.database ?? {};
   const aggregate = database.aggregate ?? database.timedAggregate ?? {};
   const stats = runtime?.containerStatsSnapshot ?? {};
-  const storageBytes = firstNumber(database.tableBytesOnDisk, database.files?.["logs.sqlite"]);
+  const files = database.files ?? runtime?.databaseFiles?.afterCheckpoint ?? {};
+  const storageReadable = database.hypertableSizeReadable ?? database.tableBytesReadable;
+  const storageBytes = firstNumber(
+    database.tableBytesOnDisk,
+    files["logs.sqlite"],
+    files["logs.duckdb"],
+    parseReadableBytes(storageReadable),
+  );
   return {
     path: runtime ? runtimePath : null,
     explainPath: explain ? explainPath : null,
@@ -208,7 +234,7 @@ function runtimeSummary(runtime, explain, runtimePath, explainPath) {
     measuredRunRows: firstNumber(database.fullRunCount, runtime?.correctness?.totalAcceptedRows),
     measuredSeedRows: firstNumber(database.fullRunSeedCount, runtime?.correctness?.seedAcceptedRows),
     storageBytes,
-    storageReadable: database.hypertableSizeReadable ?? database.tableBytesReadable ?? formatBytes(storageBytes),
+    storageReadable: storageReadable ?? formatBytes(storageBytes),
     aggregateElapsedMs: firstNumber(aggregate.elapsedMs, aggregate.clickhouseClientSeconds === undefined ? null : Number(aggregate.clickhouseClientSeconds) * 1_000),
     aggregateRows: firstNumber(aggregate.rows),
     aggregateTotal: firstNumber(aggregate.total),
@@ -428,10 +454,30 @@ function rankings(rows) {
     .toSorted((left, right) => direction * (left[field] - right[field]))
     .map((row) => ({ engine: row.engine, value: row[field], specStatus: row.specStatus }));
   return {
+    seedThroughputLogsPerSecond: by("seedAcceptedRate", -1),
     streamCompletionLogsPerSecond: by("streamObservedRate", -1),
     aggregateP95Ms: by("aggregateP95Ms", 1),
     totalElapsedMs: by("totalDurationMs", 1),
+    storageBytes: by("runtimeStorageBytes", 1),
   };
+}
+
+function pairwiseRatios(rows) {
+  const duckdb = rows.find((row) => row.engine.toLowerCase() === "duckdb");
+  if (!duckdb) return {};
+  const ratios = {};
+  for (const competitorName of ["clickhouse", "timescale"]) {
+    const competitor = rows.find((row) => row.engine.toLowerCase() === competitorName);
+    if (!competitor) continue;
+    ratios[`duckdbVs${competitorName[0].toUpperCase()}${competitorName.slice(1)}`] = {
+      seedThroughput: ratio(duckdb.seedAcceptedRate, competitor.seedAcceptedRate),
+      streamCompletion: ratio(duckdb.streamObservedRate, competitor.streamObservedRate),
+      aggregateP95: ratio(duckdb.aggregateP95Ms, competitor.aggregateP95Ms),
+      totalElapsed: ratio(duckdb.totalDurationMs, competitor.totalDurationMs),
+      storage: ratio(duckdb.runtimeStorageBytes, competitor.runtimeStorageBytes),
+    };
+  }
+  return ratios;
 }
 
 function reportNotes(rows) {
@@ -440,6 +486,16 @@ function reportNotes(rows) {
     "Dispatch rate is request scheduling; completion rate is accepted rows divided by stream wall time. The 500 logs/s gate requires both within +/-1% of 500; dispatch alone is not sufficient.",
     "The aggregate gate is harness aggregate-sample p95 < 1,000ms. Harness correctness additionally requires zero failures and exact seed/final persisted counts.",
   ];
+  const duckdb = rows.find((row) => row.engine.toLowerCase() === "duckdb");
+  const clickhouse = rows.find((row) => row.engine.toLowerCase() === "clickhouse");
+  if (duckdb && clickhouse && duckdb.aggregateP95Ms !== null && clickhouse.aggregateP95Ms !== null) {
+    const delta = Math.abs(duckdb.aggregateP95Ms - clickhouse.aggregateP95Ms);
+    notes.push(`Aggregate p95 raw ordering is ${duckdb.engine} ${duckdb.aggregateP95Ms} ms vs ${clickhouse.engine} ${clickhouse.aggregateP95Ms} ms; the ${Number(delta.toFixed(3))} ms difference is treated as effectively tied/noise without repeated evidence.`);
+  }
+  if (duckdb) notes.push("DuckDB operational nuance: this run uses an embedded single-process database file. Direct SQL/checkpoint evidence required stopping only the isolated API to release the file lock; this is an operational distinction, not a correctness failure.");
+  const wholeWorkload = [...rows].filter((row) => row.spec?.pass).toSorted((left, right) => (left.totalDurationMs ?? Infinity) - (right.totalDurationMs ?? Infinity))[0];
+  if (wholeWorkload) notes.push(`Whole-workload winner among spec-passing runs by total elapsed time is ${wholeWorkload.engine} (${wholeWorkload.totalDurationMs} ms); aggregate-p95 near-ties do not override the end-to-end result.`);
+  notes.push("Storage ranking uses each runtime artifact's reported primary storage measure: Timescale hypertable size, SQLite main database file, ClickHouse table bytes, or DuckDB post-checkpoint database file. WAL/volume overhead and compression semantics differ, so this is directional evidence rather than a normalized physical-footprint comparison.");
   const withSmoke = rows.filter((row) => row.runtime?.smokeArtifact && row.runtime?.storedRows !== null && row.runtime?.measuredRunRows !== null);
   if (withSmoke.length) {
     notes.push("Storage nuance: each full run followed same-database smoke; runtime stored-row counts include smoke rows (typically 1,025,500), while measured-window counts isolate the full run at 1,015,000.");
@@ -546,8 +602,11 @@ function markdownReport(rows, comparison) {
     "## Rankings",
     "",
     `- Accepted completion rate (descending): ${rankingText(ranking.streamCompletionLogsPerSecond, (metric) => `${metric} logs/s`)}.`,
+    `- Seed throughput (descending): ${rankingText(ranking.seedThroughputLogsPerSecond, (metric) => `${metric} logs/s`)}.`,
     `- Aggregate sample p95 (ascending): ${rankingText(ranking.aggregateP95Ms, (metric) => `${metric} ms`)}.`,
     `- Total elapsed time (ascending): ${rankingText(ranking.totalElapsedMs, (metric) => `${metric} ms`)}.`,
+    `- Reported primary storage (ascending): ${rankingText(ranking.storageBytes, (metric) => `${formatBytes(metric)} (${metric} bytes)`)}.`,
+    ...Object.entries(pairwiseRatios(rows)).map(([name, values]) => `- ${name} ratios (DuckDB / competitor; throughput >1 is faster, lower-is-better metrics <1 are better): seed throughput ${value(values.seedThroughput)}x, stream completion ${value(values.streamCompletion)}x, aggregate p95 ${value(values.aggregateP95)}x, total elapsed ${value(values.totalElapsed)}x, storage ${value(values.storage)}x.`),
     "",
     "## Notes",
     "",
@@ -585,6 +644,7 @@ function jsonReport(rows, comparison) {
     specGateDefinition: specGateDefinition(),
     notes: reportNotes(rows),
     rankings: rankings(rows),
+    pairwiseRatios: pairwiseRatios(rows),
     rows,
   }, null, 2) + "\n";
 }
@@ -618,6 +678,31 @@ function selfCheck() {
   if (!comparable.compatible || row.comparisonStatus !== "COMPARABLE") fail("comparison compatibility check failed");
   if (!markdownReport([row], comparable).includes("sqlite")) fail("markdown rendering check failed");
   if (!csvReport([row]).includes("Ingest p50 ms")) fail("csv rendering check failed");
+  const duckdb = flattenArtifact({
+    status: "passed",
+    engine: "duckdb",
+    config: {
+      seedRows: 3,
+      batchSize: 1,
+      rate: 4,
+      durationSec: 2,
+      bucket: "1m",
+      timestampSpanMs: 60_000,
+      sampleIntervalMs: 1_000,
+      maxInFlight: 2,
+    },
+    phases: {
+      seed: { acceptedRows: 3 },
+      stream: { acceptedRows: 8, observedAcceptedRate: 4 },
+      streamRateControl: { scheduledRate: 4 },
+      aggregateSamples: { count: 2, correct: 2, latencyMs: { p95Ms: 4 } },
+    },
+    verification: { seedAggregate: { ok: true }, finalAggregate: { ok: true } },
+    correctness: { overall: true },
+  }, "duckdb.json");
+  const duckdbComparison = comparableDifferences([row, duckdb]);
+  if (!duckdbComparison.compatible || duckdb.comparisonStatus !== "COMPARABLE") fail("duckdb compatibility check failed");
+  if (!markdownReport([row, duckdb], duckdbComparison).includes("duckdb")) fail("duckdb markdown rendering check failed");
   const failed = flattenArtifact({
     status: "failed",
     engine: "clickhouse",

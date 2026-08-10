@@ -1,0 +1,541 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "log-service-http",
+  "status": "passed",
+  "startedAt": "2026-08-10T07:32:48.301Z",
+  "endedAt": "2026-08-10T07:46:21.299Z",
+  "engine": "duckdb",
+  "config": {
+    "targetUrl": "http://127.0.0.1:18083",
+    "apiPort": null,
+    "engine": "duckdb",
+    "seedRows": 1000000,
+    "batchSize": 500,
+    "durationSec": 30,
+    "rate": 500,
+    "seed": 20260720,
+    "runId": "duckdb-full-1m-500lps-30s-20260810",
+    "bucket": "1m",
+    "aggregateQuery": {
+      "endpoint": "/logs/aggregate",
+      "bucket": "1m",
+      "groupBy": "service",
+      "sampledFilters": [
+        "attr.run_id",
+        "attr.phase=seed"
+      ],
+      "finalFilters": [
+        "attr.run_id"
+      ]
+    },
+    "sampleIntervalMs": 1000,
+    "timeoutMs": 30000,
+    "maxInFlight": 256,
+    "baseTimestamp": "2026-08-10T07:22:48.301Z",
+    "timestampSpanMs": 60000,
+    "smoke": false,
+    "retentionProbeRequested": false,
+    "expectedRows": {
+      "seedAccepted": 1000000,
+      "allAccepted": 1015000
+    }
+  },
+  "machine": {
+    "hostname": "pop-os",
+    "platform": "linux",
+    "release": "6.17.9-76061709-generic",
+    "arch": "x64",
+    "node": "v24.13.1",
+    "cpuCount": 24,
+    "cpuModel": "AMD Ryzen 9 7900X3D 12-Core Processor",
+    "cpuSpeedMHz": 4538,
+    "memoryTotalBytes": 134225956864,
+    "memoryFreeBytesAtStart": 5285695488,
+    "loadAverageAtStart": [
+      8.21,
+      7.95,
+      7.56
+    ]
+  },
+  "phases": {
+    "seed": {
+      "requests": 2000,
+      "attemptedRows": 1000000,
+      "acceptedRows": 1000000,
+      "rejectedRows": 0,
+      "failures": 0,
+      "durationMs": 782605.373,
+      "observedAcceptedRate": 1277.783,
+      "latencyMs": {
+        "count": 2000,
+        "minMs": 314.239,
+        "maxMs": 1135.73,
+        "meanMs": 390.636,
+        "p50Ms": 383.236,
+        "p95Ms": 428.844,
+        "p99Ms": 501.404
+      },
+      "failureDetails": []
+    },
+    "stream": {
+      "requests": 30,
+      "attemptedRows": 15000,
+      "acceptedRows": 15000,
+      "rejectedRows": 0,
+      "failures": 0,
+      "durationMs": 30075.189,
+      "observedAcceptedRate": 498.75,
+      "latencyMs": {
+        "count": 30,
+        "minMs": 410.815,
+        "maxMs": 1239.121,
+        "meanMs": 505.081,
+        "p50Ms": 475.597,
+        "p95Ms": 667.83,
+        "p99Ms": 1099.391
+      },
+      "failureDetails": []
+    },
+    "streamRateControl": {
+      "attemptedRows": 15000,
+      "scheduledDurationMs": 30000,
+      "dispatchStartToLastMs": 28999.899,
+      "scheduledRate": 500,
+      "actualDispatchWindowMs": 29999.899,
+      "actualDispatchRate": 500.002,
+      "maxDispatchLagMs": 0.702
+    },
+    "aggregateSamples": {
+      "count": 31,
+      "correct": 31,
+      "correctnessRate": 1,
+      "latencyMs": {
+        "count": 31,
+        "minMs": 57.831,
+        "maxMs": 302.449,
+        "meanMs": 79.886,
+        "p50Ms": 69.24,
+        "p95Ms": 99.792,
+        "p99Ms": 241.853
+      },
+      "failures": 0,
+      "failureDetails": [],
+      "results": [
+        {
+          "at": "2026-08-10T07:45:51.228Z",
+          "latencyMs": 74.719,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 0.452
+        },
+        {
+          "at": "2026-08-10T07:45:52.222Z",
+          "latencyMs": 69.24,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 1001.203
+        },
+        {
+          "at": "2026-08-10T07:45:53.222Z",
+          "latencyMs": 69.077,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 2001.169
+        },
+        {
+          "at": "2026-08-10T07:45:54.237Z",
+          "latencyMs": 83.323,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 3001.577
+        },
+        {
+          "at": "2026-08-10T07:45:55.217Z",
+          "latencyMs": 63.256,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 4001.384
+        },
+        {
+          "at": "2026-08-10T07:45:56.455Z",
+          "latencyMs": 302.449,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 5000.718
+        },
+        {
+          "at": "2026-08-10T07:45:57.233Z",
+          "latencyMs": 79.673,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 6000.794
+        },
+        {
+          "at": "2026-08-10T07:45:58.223Z",
+          "latencyMs": 70.993,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 7000.416
+        },
+        {
+          "at": "2026-08-10T07:45:59.220Z",
+          "latencyMs": 66.415,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 8001.455
+        },
+        {
+          "at": "2026-08-10T07:46:00.253Z",
+          "latencyMs": 99.122,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 9001.591
+        },
+        {
+          "at": "2026-08-10T07:46:01.218Z",
+          "latencyMs": 65.14,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 10001.066
+        },
+        {
+          "at": "2026-08-10T07:46:02.217Z",
+          "latencyMs": 64.57,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 11000.821
+        },
+        {
+          "at": "2026-08-10T07:46:03.213Z",
+          "latencyMs": 60.12,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 12001.123
+        },
+        {
+          "at": "2026-08-10T07:46:04.225Z",
+          "latencyMs": 71.106,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 13001.529
+        },
+        {
+          "at": "2026-08-10T07:46:05.220Z",
+          "latencyMs": 66.817,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 14001.174
+        },
+        {
+          "at": "2026-08-10T07:46:06.233Z",
+          "latencyMs": 79.092,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 15002.076
+        },
+        {
+          "at": "2026-08-10T07:46:07.230Z",
+          "latencyMs": 77.499,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 16000.669
+        },
+        {
+          "at": "2026-08-10T07:46:08.213Z",
+          "latencyMs": 60.529,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 17000.879
+        },
+        {
+          "at": "2026-08-10T07:46:09.247Z",
+          "latencyMs": 94.753,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 18000.656
+        },
+        {
+          "at": "2026-08-10T07:46:10.217Z",
+          "latencyMs": 63.331,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 19001.267
+        },
+        {
+          "at": "2026-08-10T07:46:11.223Z",
+          "latencyMs": 70.515,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 20000.247
+        },
+        {
+          "at": "2026-08-10T07:46:12.223Z",
+          "latencyMs": 70.162,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 21000.999
+        },
+        {
+          "at": "2026-08-10T07:46:13.218Z",
+          "latencyMs": 65.337,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 22001.055
+        },
+        {
+          "at": "2026-08-10T07:46:14.247Z",
+          "latencyMs": 93.68,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 23000.725
+        },
+        {
+          "at": "2026-08-10T07:46:15.214Z",
+          "latencyMs": 61.293,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 24000.753
+        },
+        {
+          "at": "2026-08-10T07:46:16.220Z",
+          "latencyMs": 67.79,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 25000.301
+        },
+        {
+          "at": "2026-08-10T07:46:17.220Z",
+          "latencyMs": 67.028,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 26001.132
+        },
+        {
+          "at": "2026-08-10T07:46:18.219Z",
+          "latencyMs": 66.069,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 27000.826
+        },
+        {
+          "at": "2026-08-10T07:46:19.253Z",
+          "latencyMs": 100.462,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 28000.403
+        },
+        {
+          "at": "2026-08-10T07:46:20.210Z",
+          "latencyMs": 57.831,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 29000.641
+        },
+        {
+          "at": "2026-08-10T07:46:21.227Z",
+          "latencyMs": 75.075,
+          "ok": true,
+          "expectedTotal": 1000000,
+          "actualTotal": 1000000,
+          "differenceCount": 0,
+          "error": null,
+          "elapsedSincePhaseStartMs": 29999.979
+        }
+      ]
+    }
+  },
+  "verification": {
+    "health": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 36.464
+    },
+    "seedAggregate": {
+      "label": "seed",
+      "latencyMs": 141.097,
+      "ok": true,
+      "expectedTotal": 1000000,
+      "actualTotal": 1000000,
+      "missing": [],
+      "unexpected": [],
+      "mismatched": [],
+      "responseErrors": [],
+      "differenceCount": 0
+    },
+    "seedLogs": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 49.842,
+      "countReturned": 1,
+      "nextCursorType": "string",
+      "error": null
+    },
+    "finalAggregate": {
+      "label": "final",
+      "latencyMs": 37.457,
+      "ok": true,
+      "expectedTotal": 1015000,
+      "actualTotal": 1015000,
+      "missing": [],
+      "unexpected": [],
+      "mismatched": [],
+      "responseErrors": [],
+      "differenceCount": 0
+    },
+    "finalLogs": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 32.717,
+      "countReturned": 1,
+      "nextCursorType": "string",
+      "error": null
+    }
+  },
+  "metrics": {
+    "failures": 0,
+    "failureDetails": [],
+    "ingestLatencyMs": {
+      "count": 2030,
+      "minMs": 314.239,
+      "maxMs": 1239.121,
+      "meanMs": 392.327,
+      "p50Ms": 383.571,
+      "p95Ms": 435.795,
+      "p99Ms": 526.338
+    },
+    "aggregateLatencyMs": {
+      "count": 33,
+      "minMs": 37.457,
+      "maxMs": 302.449,
+      "meanMs": 80.455,
+      "p50Ms": 69.24,
+      "p95Ms": 116.716,
+      "p99Ms": 250.816
+    },
+    "ingest": {
+      "seedAcceptedRows": 1000000,
+      "streamAcceptedRows": 15000,
+      "totalAcceptedRows": 1015000,
+      "targetStreamRate": 500,
+      "observedStreamCompletionRate": 498.75,
+      "scheduledStreamRate": 500
+    }
+  },
+  "durationsMs": {
+    "health": 36.587,
+    "seed": 782615.141,
+    "seedVerification": 196.859,
+    "stream": 30076.079,
+    "finalVerification": 70.411,
+    "retention": 0.212,
+    "total": 812998.285
+  },
+  "retention": {
+    "status": "skipped",
+    "reason": "not requested"
+  },
+  "throughput": {
+    "targetStreamLogsPerSecond": 500,
+    "seedAcceptedLogsPerSecond": 1277.783,
+    "streamAcceptedLogsPerSecond": 498.75,
+    "streamPlannedLogsPerSecond": 500,
+    "streamDispatchLogsPerSecond": 500.002,
+    "totalAcceptedLogsPerSecond": 1248.465
+  },
+  "correctness": {
+    "seedPersisted": true,
+    "samplesCorrect": true,
+    "finalPersisted": true,
+    "overall": true
+  }
+}

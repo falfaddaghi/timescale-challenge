@@ -1,0 +1,657 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-10T07:57:40.469Z",
+  "compatible": true,
+  "warnings": [],
+  "specGateDefinition": {
+    "targetRateLogsPerSecond": 500,
+    "durationSec": 30,
+    "rateTolerancePercent": 1,
+    "sustainedRateRequires": [
+      "dispatch rate",
+      "accepted completion rate"
+    ],
+    "aggregateP95LessThanMs": 1000,
+    "zeroFailures": true,
+    "correctness": "PASS"
+  },
+  "notes": [
+    "Protocol comparability: all rows use seedRows=1,000,000, batchSize=500, target=500 logs/s, duration=30s, bucket=1m, service grouping, and the same run_id/phase-filtered aggregate query shape.",
+    "Dispatch rate is request scheduling; completion rate is accepted rows divided by stream wall time. The 500 logs/s gate requires both within +/-1% of 500; dispatch alone is not sufficient.",
+    "The aggregate gate is harness aggregate-sample p95 < 1,000ms. Harness correctness additionally requires zero failures and exact seed/final persisted counts.",
+    "Aggregate p95 raw ordering is duckdb 99.792 ms vs clickhouse 99.999 ms; the 0.207 ms difference is treated as effectively tied/noise without repeated evidence.",
+    "DuckDB operational nuance: this run uses an embedded single-process database file. Direct SQL/checkpoint evidence required stopping only the isolated API to release the file lock; this is an operational distinction, not a correctness failure.",
+    "Whole-workload winner among spec-passing runs by total elapsed time is clickhouse (47957.191 ms); aggregate-p95 near-ties do not override the end-to-end result.",
+    "Storage ranking uses each runtime artifact's reported primary storage measure: Timescale hypertable size, SQLite main database file, ClickHouse table bytes, or DuckDB post-checkpoint database file. WAL/volume overhead and compression semantics differ, so this is directional evidence rather than a normalized physical-footprint comparison.",
+    "Storage nuance: each full run followed same-database smoke; runtime stored-row counts include smoke rows (typically 1,025,500), while measured-window counts isolate the full run at 1,015,000.",
+    "sqlite spec gate: FAIL (accepted completion rate is outside +/-1% of 500 logs/s; aggregate sample p95 is not under 1s). The run can still be correctness-comparable when its status, configuration, and exact aggregates pass."
+  ],
+  "rankings": {
+    "seedThroughputLogsPerSecond": [
+      {
+        "engine": "clickhouse",
+        "value": 56435.606,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "timescale",
+        "value": 11379.798,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "sqlite",
+        "value": 4733.77,
+        "specStatus": "FAIL"
+      },
+      {
+        "engine": "duckdb",
+        "value": 1277.783,
+        "specStatus": "PASS"
+      }
+    ],
+    "streamCompletionLogsPerSecond": [
+      {
+        "engine": "clickhouse",
+        "value": 500.009,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "timescale",
+        "value": 499.991,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "duckdb",
+        "value": 498.75,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "sqlite",
+        "value": 229.912,
+        "specStatus": "FAIL"
+      }
+    ],
+    "aggregateP95Ms": [
+      {
+        "engine": "duckdb",
+        "value": 99.792,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "clickhouse",
+        "value": 99.999,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "timescale",
+        "value": 321.588,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "sqlite",
+        "value": 24180.626,
+        "specStatus": "FAIL"
+      }
+    ],
+    "totalElapsedMs": [
+      {
+        "engine": "clickhouse",
+        "value": 47957.191,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "timescale",
+        "value": 118494.077,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "sqlite",
+        "value": 315548.834,
+        "specStatus": "FAIL"
+      },
+      {
+        "engine": "duckdb",
+        "value": 812998.285,
+        "specStatus": "PASS"
+      }
+    ],
+    "storageBytes": [
+      {
+        "engine": "clickhouse",
+        "value": 24780277,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "duckdb",
+        "value": 317730816,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "timescale",
+        "value": 591000000,
+        "specStatus": "PASS"
+      },
+      {
+        "engine": "sqlite",
+        "value": 870043648,
+        "specStatus": "FAIL"
+      }
+    ]
+  },
+  "pairwiseRatios": {
+    "duckdbVsClickhouse": {
+      "seedThroughput": 0.023,
+      "streamCompletion": 0.997,
+      "aggregateP95": 0.998,
+      "totalElapsed": 16.953,
+      "storage": 12.822
+    },
+    "duckdbVsTimescale": {
+      "seedThroughput": 0.112,
+      "streamCompletion": 0.998,
+      "aggregateP95": 0.31,
+      "totalElapsed": 6.861,
+      "storage": 0.538
+    }
+  },
+  "rows": [
+    {
+      "file": "benchmarks/results/log-benchmark-20260809212554868-timescale-full-1m-500lps-30s-20260810.json",
+      "status": "passed",
+      "engine": "timescale",
+      "target": "http://127.0.0.1:18080",
+      "runId": "timescale-full-1m-500lps-30s-20260810",
+      "seedRows": 1000000,
+      "batchSize": 500,
+      "targetRate": 500,
+      "durationSec": 30,
+      "seedAcceptedRate": 11379.798,
+      "seedAccepted": 1000000,
+      "streamAccepted": 15000,
+      "totalAccepted": 1015000,
+      "streamObservedRate": 499.991,
+      "totalAcceptedRate": 8565.831,
+      "streamScheduledRate": 500,
+      "streamActualDispatchRate": 500.008,
+      "ingestP50Ms": 25.82,
+      "ingestP95Ms": 121.303,
+      "ingestP99Ms": 253.384,
+      "aggregateP50Ms": 301.205,
+      "aggregateP95Ms": 321.588,
+      "aggregateP99Ms": 324.656,
+      "aggregateSamples": 30,
+      "aggregateCorrect": 30,
+      "seedPersisted": true,
+      "finalPersisted": true,
+      "correctness": "PASS",
+      "failures": 0,
+      "totalDurationMs": 118494.077,
+      "seedDurationMs": 87878.812,
+      "streamDurationMs": 30001.229,
+      "finalVerificationMs": 212.427,
+      "retention": "skipped",
+      "signature": {
+        "seedRows": 1000000,
+        "batchSize": 500,
+        "rate": 500,
+        "durationSec": 30,
+        "bucket": "1m",
+        "timestampSpanMs": 60000,
+        "sampleIntervalMs": 1000,
+        "maxInFlight": 256,
+        "query": {
+          "endpoint": "/logs/aggregate",
+          "bucket": "1m",
+          "groupBy": "service",
+          "sampledFilters": [
+            "attr.phase=seed",
+            "attr.run_id"
+          ],
+          "finalFilters": [
+            "attr.run_id"
+          ]
+        }
+      },
+      "comparisonStatus": "COMPARABLE",
+      "comparisonIssues": [],
+      "runtime": {
+        "path": "benchmarks/results/timescale-full-1m-500lps-30s-20260810.runtime.json",
+        "explainPath": "benchmarks/results/timescale-full-1m-500lps-30s-20260810.explain.json",
+        "composeProject": "timescale-bench-20260810",
+        "hostUrl": "http://127.0.0.1:18080",
+        "smokeArtifact": "benchmarks/results/log-benchmark-20260809212535033-timescale-smoke-20260810.json",
+        "storedRows": 1025500,
+        "measuredRunRows": 1015000,
+        "measuredSeedRows": 1000000,
+        "storageBytes": 591000000,
+        "storageReadable": "591 MB",
+        "aggregateElapsedMs": 354.976,
+        "aggregateRows": 16,
+        "aggregateTotal": 1000000,
+        "runtimeStats": {
+          "api": {
+            "cpuPercent": 0,
+            "memory": "58.34MiB / 125GiB",
+            "memoryPercent": 0.05,
+            "networkIo": "237MB / 329MB",
+            "blockIo": "88.7MB / 0B",
+            "pids": 11
+          },
+          "timescaledb": {
+            "cpuPercent": 0.07,
+            "memory": "1.238GiB / 125GiB",
+            "memoryPercent": 0.99,
+            "networkIo": "328MB / 614kB",
+            "blockIo": "107MB / 4.22GB",
+            "pids": 9
+          }
+        },
+        "explain": {
+          "rootNode": "Sort",
+          "actualTotalTimeMs": 354.976,
+          "workersPlanned": 3,
+          "workersLaunched": 3,
+          "sharedHitBlocks": 26993,
+          "sharedReadBlocks": 0
+        }
+      },
+      "spec": {
+        "targetConfigured": true,
+        "dispatchRate": 500.008,
+        "completionRate": 499.991,
+        "rateTolerancePercent": 1,
+        "sustained500": true,
+        "aggregateP95Ms": 321.588,
+        "aggregateP95Under1s": true,
+        "zeroFailures": true,
+        "correctness": true,
+        "pass": true,
+        "reasons": []
+      },
+      "specStatus": "PASS",
+      "specSustained500": "PASS",
+      "specAggregateP95": "PASS",
+      "specZeroFailures": "PASS",
+      "specCorrectness": "PASS",
+      "runtimeStoredRows": 1025500,
+      "runtimeMeasuredRows": 1015000,
+      "runtimeStorageBytes": 591000000,
+      "runtimeStorage": "591 MB",
+      "runtimeAggregateMs": 354.976,
+      "relativeToBaseline": {
+        "baselineEngine": "timescale",
+        "seedThroughput": 1,
+        "streamCompletion": 1,
+        "aggregateP95": 1,
+        "totalElapsed": 1
+      },
+      "completionVsBaseline": 1,
+      "seedThroughputVsBaseline": 1,
+      "aggregateP95VsBaseline": 1,
+      "totalElapsedVsBaseline": 1
+    },
+    {
+      "file": "benchmarks/results/log-benchmark-20260809213239108-sqlite-full-1m-500lps-30s-20260810.json",
+      "status": "passed",
+      "engine": "sqlite",
+      "target": "http://127.0.0.1:18081",
+      "runId": "sqlite-full-1m-500lps-30s-20260810",
+      "seedRows": 1000000,
+      "batchSize": 500,
+      "targetRate": 500,
+      "durationSec": 30,
+      "seedAcceptedRate": 4733.77,
+      "seedAccepted": 1000000,
+      "streamAccepted": 15000,
+      "totalAccepted": 1015000,
+      "streamObservedRate": 229.912,
+      "totalAcceptedRate": 3216.618,
+      "streamScheduledRate": 500,
+      "streamActualDispatchRate": 500.007,
+      "ingestP50Ms": 76.826,
+      "ingestP95Ms": 220.773,
+      "ingestP99Ms": 251.026,
+      "aggregateP50Ms": 20977.941,
+      "aggregateP95Ms": 24180.626,
+      "aggregateP99Ms": 24465.309,
+      "aggregateSamples": 3,
+      "aggregateCorrect": 3,
+      "seedPersisted": true,
+      "finalPersisted": true,
+      "correctness": "PASS",
+      "failures": 0,
+      "totalDurationMs": 315548.834,
+      "seedDurationMs": 211253.887,
+      "streamDurationMs": 65243.366,
+      "finalVerificationMs": 19746.614,
+      "retention": "skipped",
+      "signature": {
+        "seedRows": 1000000,
+        "batchSize": 500,
+        "rate": 500,
+        "durationSec": 30,
+        "bucket": "1m",
+        "timestampSpanMs": 60000,
+        "sampleIntervalMs": 1000,
+        "maxInFlight": 256,
+        "query": {
+          "endpoint": "/logs/aggregate",
+          "bucket": "1m",
+          "groupBy": "service",
+          "sampledFilters": [
+            "attr.phase=seed",
+            "attr.run_id"
+          ],
+          "finalFilters": [
+            "attr.run_id"
+          ]
+        }
+      },
+      "comparisonStatus": "COMPARABLE",
+      "comparisonIssues": [],
+      "runtime": {
+        "path": "benchmarks/results/sqlite-full-1m-500lps-30s-20260810.runtime.json",
+        "explainPath": null,
+        "composeProject": "timescale-challenge-sqlite-full",
+        "hostUrl": "http://127.0.0.1:18081",
+        "smokeArtifact": "benchmarks/results/log-benchmark-20260809213222045-sqlite-smoke-20260810.json",
+        "storedRows": 1025500,
+        "measuredRunRows": 1015000,
+        "measuredSeedRows": 1000000,
+        "storageBytes": 870043648,
+        "storageReadable": "829.74 MiB",
+        "aggregateElapsedMs": 19990.671,
+        "aggregateRows": 16,
+        "aggregateTotal": 1000000,
+        "runtimeStats": {
+          "cpuPercent": 0,
+          "memory": "79.07MiB / 125GiB",
+          "memoryPercent": 0.06,
+          "networkIo": "233MB / 889kB",
+          "blockIo": "4.64GB / 12.6GB",
+          "pids": 11,
+          "restartCount": 0
+        },
+        "explain": null
+      },
+      "spec": {
+        "targetConfigured": true,
+        "dispatchRate": 500.007,
+        "completionRate": 229.912,
+        "rateTolerancePercent": 1,
+        "sustained500": false,
+        "aggregateP95Ms": 24180.626,
+        "aggregateP95Under1s": false,
+        "zeroFailures": true,
+        "correctness": true,
+        "pass": false,
+        "reasons": [
+          "accepted completion rate is outside +/-1% of 500 logs/s",
+          "aggregate sample p95 is not under 1s"
+        ]
+      },
+      "specStatus": "FAIL",
+      "specSustained500": "FAIL",
+      "specAggregateP95": "FAIL",
+      "specZeroFailures": "PASS",
+      "specCorrectness": "PASS",
+      "runtimeStoredRows": 1025500,
+      "runtimeMeasuredRows": 1015000,
+      "runtimeStorageBytes": 870043648,
+      "runtimeStorage": "829.74 MiB",
+      "runtimeAggregateMs": 19990.671,
+      "relativeToBaseline": {
+        "baselineEngine": "timescale",
+        "seedThroughput": 0.416,
+        "streamCompletion": 0.46,
+        "aggregateP95": 75.191,
+        "totalElapsed": 2.663
+      },
+      "completionVsBaseline": 0.46,
+      "seedThroughputVsBaseline": 0.416,
+      "aggregateP95VsBaseline": 75.191,
+      "totalElapsedVsBaseline": 2.663
+    },
+    {
+      "file": "benchmarks/results/log-benchmark-20260809214206634-clickhouse-full-1m-500lps-30s-20260810.json",
+      "status": "passed",
+      "engine": "clickhouse",
+      "target": "http://127.0.0.1:18082",
+      "runId": "clickhouse-full-1m-500lps-30s-20260810",
+      "seedRows": 1000000,
+      "batchSize": 500,
+      "targetRate": 500,
+      "durationSec": 30,
+      "seedAcceptedRate": 56435.606,
+      "seedAccepted": 1000000,
+      "streamAccepted": 15000,
+      "totalAccepted": 1015000,
+      "streamObservedRate": 500.009,
+      "totalAcceptedRate": 21164.721,
+      "streamScheduledRate": 500,
+      "streamActualDispatchRate": 500.004,
+      "ingestP50Ms": 7.919,
+      "ingestP95Ms": 10.949,
+      "ingestP99Ms": 14.487,
+      "aggregateP50Ms": 87.03,
+      "aggregateP95Ms": 99.999,
+      "aggregateP99Ms": 102.371,
+      "aggregateSamples": 30,
+      "aggregateCorrect": 30,
+      "seedPersisted": true,
+      "finalPersisted": true,
+      "correctness": "PASS",
+      "failures": 0,
+      "totalDurationMs": 47957.191,
+      "seedDurationMs": 17723.064,
+      "streamDurationMs": 30005.088,
+      "finalVerificationMs": 81.218,
+      "retention": "skipped",
+      "signature": {
+        "seedRows": 1000000,
+        "batchSize": 500,
+        "rate": 500,
+        "durationSec": 30,
+        "bucket": "1m",
+        "timestampSpanMs": 60000,
+        "sampleIntervalMs": 1000,
+        "maxInFlight": 256,
+        "query": {
+          "endpoint": "/logs/aggregate",
+          "bucket": "1m",
+          "groupBy": "service",
+          "sampledFilters": [
+            "attr.phase=seed",
+            "attr.run_id"
+          ],
+          "finalFilters": [
+            "attr.run_id"
+          ]
+        }
+      },
+      "comparisonStatus": "COMPARABLE",
+      "comparisonIssues": [],
+      "runtime": {
+        "path": "benchmarks/results/clickhouse-full-1m-500lps-30s-20260810.runtime.json",
+        "explainPath": null,
+        "composeProject": "timescale-challenge-clickhouse-full",
+        "hostUrl": "http://127.0.0.1:18082",
+        "smokeArtifact": "benchmarks/results/log-benchmark-20260809214154737-clickhouse-smoke-20260810.json",
+        "storedRows": 1025500,
+        "measuredRunRows": 1015000,
+        "measuredSeedRows": 1000000,
+        "storageBytes": 24780277,
+        "storageReadable": "23.63 MiB",
+        "aggregateElapsedMs": 49,
+        "aggregateRows": 16,
+        "aggregateTotal": 1000000,
+        "runtimeStats": {
+          "api": {
+            "cpuPercent": 0,
+            "memory": "60.96MiB / 125GiB",
+            "memoryPercent": 0.05,
+            "networkIo": "239MB / 428MB",
+            "blockIo": "75.5MB / 0B",
+            "pids": 11,
+            "restartCount": 0
+          },
+          "clickhouse": {
+            "cpuPercent": 2.26,
+            "memory": "397.8MiB / 125GiB",
+            "memoryPercent": 0.31,
+            "networkIo": "427MB / 2.28MB",
+            "blockIo": "514MB / 736MB",
+            "pids": 735,
+            "restartCount": 0
+          }
+        },
+        "explain": null
+      },
+      "spec": {
+        "targetConfigured": true,
+        "dispatchRate": 500.004,
+        "completionRate": 500.009,
+        "rateTolerancePercent": 1,
+        "sustained500": true,
+        "aggregateP95Ms": 99.999,
+        "aggregateP95Under1s": true,
+        "zeroFailures": true,
+        "correctness": true,
+        "pass": true,
+        "reasons": []
+      },
+      "specStatus": "PASS",
+      "specSustained500": "PASS",
+      "specAggregateP95": "PASS",
+      "specZeroFailures": "PASS",
+      "specCorrectness": "PASS",
+      "runtimeStoredRows": 1025500,
+      "runtimeMeasuredRows": 1015000,
+      "runtimeStorageBytes": 24780277,
+      "runtimeStorage": "23.63 MiB",
+      "runtimeAggregateMs": 49,
+      "relativeToBaseline": {
+        "baselineEngine": "timescale",
+        "seedThroughput": 4.959,
+        "streamCompletion": 1,
+        "aggregateP95": 0.311,
+        "totalElapsed": 0.405
+      },
+      "completionVsBaseline": 1,
+      "seedThroughputVsBaseline": 4.959,
+      "aggregateP95VsBaseline": 0.311,
+      "totalElapsedVsBaseline": 0.405
+    },
+    {
+      "file": "benchmarks/results/log-benchmark-20260810073248301-duckdb-full-1m-500lps-30s-20260810.json",
+      "status": "passed",
+      "engine": "duckdb",
+      "target": "http://127.0.0.1:18083",
+      "runId": "duckdb-full-1m-500lps-30s-20260810",
+      "seedRows": 1000000,
+      "batchSize": 500,
+      "targetRate": 500,
+      "durationSec": 30,
+      "seedAcceptedRate": 1277.783,
+      "seedAccepted": 1000000,
+      "streamAccepted": 15000,
+      "totalAccepted": 1015000,
+      "streamObservedRate": 498.75,
+      "totalAcceptedRate": 1248.465,
+      "streamScheduledRate": 500,
+      "streamActualDispatchRate": 500.002,
+      "ingestP50Ms": 383.236,
+      "ingestP95Ms": 428.844,
+      "ingestP99Ms": 501.404,
+      "aggregateP50Ms": 69.24,
+      "aggregateP95Ms": 99.792,
+      "aggregateP99Ms": 241.853,
+      "aggregateSamples": 31,
+      "aggregateCorrect": 31,
+      "seedPersisted": true,
+      "finalPersisted": true,
+      "correctness": "PASS",
+      "failures": 0,
+      "totalDurationMs": 812998.285,
+      "seedDurationMs": 782615.141,
+      "streamDurationMs": 30076.079,
+      "finalVerificationMs": 70.411,
+      "retention": "skipped",
+      "signature": {
+        "seedRows": 1000000,
+        "batchSize": 500,
+        "rate": 500,
+        "durationSec": 30,
+        "bucket": "1m",
+        "timestampSpanMs": 60000,
+        "sampleIntervalMs": 1000,
+        "maxInFlight": 256,
+        "query": {
+          "endpoint": "/logs/aggregate",
+          "bucket": "1m",
+          "groupBy": "service",
+          "sampledFilters": [
+            "attr.phase=seed",
+            "attr.run_id"
+          ],
+          "finalFilters": [
+            "attr.run_id"
+          ]
+        }
+      },
+      "comparisonStatus": "COMPARABLE",
+      "comparisonIssues": [],
+      "runtime": {
+        "path": "benchmarks/results/duckdb-full-1m-500lps-30s-20260810.runtime.json",
+        "explainPath": null,
+        "composeProject": "timescale-duckdb-full-20260810",
+        "hostUrl": "http://127.0.0.1:18083",
+        "smokeArtifact": "benchmarks/results/log-benchmark-20260810073218810-duckdb-smoke-20260810.json",
+        "storedRows": null,
+        "measuredRunRows": null,
+        "measuredSeedRows": null,
+        "storageBytes": 317730816,
+        "storageReadable": "303.01 MiB",
+        "aggregateElapsedMs": null,
+        "aggregateRows": null,
+        "aggregateTotal": null,
+        "runtimeStats": {},
+        "explain": null
+      },
+      "spec": {
+        "targetConfigured": true,
+        "dispatchRate": 500.002,
+        "completionRate": 498.75,
+        "rateTolerancePercent": 1,
+        "sustained500": true,
+        "aggregateP95Ms": 99.792,
+        "aggregateP95Under1s": true,
+        "zeroFailures": true,
+        "correctness": true,
+        "pass": true,
+        "reasons": []
+      },
+      "specStatus": "PASS",
+      "specSustained500": "PASS",
+      "specAggregateP95": "PASS",
+      "specZeroFailures": "PASS",
+      "specCorrectness": "PASS",
+      "runtimeStoredRows": null,
+      "runtimeMeasuredRows": null,
+      "runtimeStorageBytes": 317730816,
+      "runtimeStorage": "303.01 MiB",
+      "runtimeAggregateMs": null,
+      "relativeToBaseline": {
+        "baselineEngine": "timescale",
+        "seedThroughput": 0.112,
+        "streamCompletion": 0.998,
+        "aggregateP95": 0.31,
+        "totalElapsed": 6.861
+      },
+      "completionVsBaseline": 0.998,
+      "seedThroughputVsBaseline": 0.112,
+      "aggregateP95VsBaseline": 0.31,
+      "totalElapsedVsBaseline": 6.861
+    }
+  ]
+}

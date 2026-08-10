@@ -209,7 +209,7 @@ Options:
   --timeout-ms N            Per-request timeout
   --health-timeout-ms N     Health-check deadline
   --max-in-flight N         Concurrent POST limit (0 means unlimited)
-  --engine NAME             Required artifact label (timescaledb/sqlite/clickhouse/...)
+  --engine NAME             Required artifact label (timescaledb/sqlite/clickhouse/duckdb/...)
   --api-port N              Override the port in --url (alias: --port)
   --run-id ID               Isolating attribute value (otherwise generated)
   --output-dir PATH         Timestamped JSON artifact directory
@@ -1020,6 +1020,8 @@ function selfCheck() {
   const parsed = parseArgs(["--smoke", "--rate", "500", "--engine", "sqlite", "--api-port", "18081"]);
   if (parsed.seedRows !== SMOKE_DEFAULTS.seedRows || parsed.rate !== 500 || parsed.batchSize !== SMOKE_DEFAULTS.batchSize) fail("argument parser check failed");
   if (new URL(parsed.targetUrl).port !== "18081" || parsed.engine !== "sqlite") fail("port/engine argument check failed");
+  const duckdb = parseArgs(["--smoke", "--engine", "duckdb", "--api-port", "18083"]);
+  if (duckdb.engine !== "duckdb" || new URL(duckdb.targetUrl).port !== "18083") fail("duckdb engine/port argument check failed");
   console.log("benchmark self-check passed (no network requests made)");
 }
 

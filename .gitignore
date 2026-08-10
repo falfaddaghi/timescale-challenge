@@ -5,6 +5,7 @@ coverage/
 data/
 benchmarks/results/*
 !benchmarks/results/*full-1m-500lps-30s-20260810.*
+!benchmarks/results/comparison-full-1m-500lps-30s-four-engines-20260810.*
 !benchmarks/results/timescale-completion-evidence-20260810.json
 !benchmarks/results/timescale-completion-evidence-20260810.md
 !benchmarks/results/timescale-completion-evidence-20260810.compose.override.yml
