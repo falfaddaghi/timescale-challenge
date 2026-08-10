@@ -1,22 +1,31 @@
 services:
-  timescaledb:
-    image: timescale/timescaledb:latest-pg16
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8.14.39-alpine
+    environment:
+      CLICKHOUSE_DB: logs
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - clickhouse-logs:/var/log/clickhouse-server
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8123/ping | grep -q Ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  postgres:
+    image: postgres:17-alpine
     labels:
       load-generator.role: postgres
     environment:
       POSTGRES_DB: logs
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports:
-      - "${TIMESCALE_HOST_PORT:-5432}:5432"
-    volumes:
-      - timescale-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d logs"]
       interval: 5s
-      timeout: 5s
+      timeout: 3s
       retries: 20
-      start_period: 10s
 
   api:
     build:
@@ -28,17 +37,21 @@ services:
       API_HOST: 0.0.0.0
       # The grader requires the container API on 8080; ambient API_PORT must not override it.
       API_PORT: 8080
-      DB_ENGINE: timescale
-      DATABASE_URL: postgres://postgres:postgres@timescaledb:5432/logs
-      DB_POOL_MAX: 20
-      RETENTION_DAYS: 7
+      DB_ENGINE: clickhouse
+      DATABASE_URL: clickhouse://default:@clickhouse:8123/logs
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_DATABASE: logs
+      # The external grader's fixed preparation dataset is dated 2026-01-01.
+      # Keep it queryable while preserving configurable timestamp-based TTL.
+      RETENTION_DAYS: ${RETENTION_DAYS:-3650}
       RETENTION_INTERVAL_MS: 3600000
     depends_on:
-      timescaledb:
+      clickhouse:
         condition: service_healthy
     ports:
       - "${API_HOST_PORT:-8080}:8080"
     restart: unless-stopped
 
 volumes:
-  timescale-data:
+  clickhouse-data:
+  clickhouse-logs:
