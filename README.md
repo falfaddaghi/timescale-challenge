@@ -2,17 +2,29 @@
 
 This service accepts structured application logs, stores them behind a small
 adapter contract, and exposes filtering, cursor pagination, and time-bucketed
-aggregation. The production/default backend is TimescaleDB. SQLite,
-ClickHouse, and DuckDB implementations use the same HTTP API and are useful
-for local development and engine comparisons.
+aggregation. ClickHouse is the selected production path for the measured
+workload: it had the best whole-workload result and runs the same API on host
+port 8082. TimescaleDB remains the assignment-compatible default-file path;
+SQLite and DuckDB use the same contract for local development and comparison.
+
+See the [storage-engine comparison and decision record](docs/solution-comparison.md)
+for the measured selection, runtime evidence, and operational trade-offs.
 
 ## Quick start
 
-The default stack is TimescaleDB plus the API. It listens on
-`http://localhost:8080`:
+The selected production path is ClickHouse plus the API. It listens on host
+port `8082`:
 
 ```sh
 cp .env.example .env
+docker compose -f compose.clickhouse.yml up --build
+curl http://localhost:8082/health
+```
+
+The root Compose file remains the TimescaleDB assignment-compatible/default
+file path and listens on `http://localhost:8080`:
+
+```sh
 docker compose up --build
 curl http://localhost:8080/health
 ```
@@ -23,14 +35,11 @@ up --build`. `API_PORT` is also configurable when a deployment needs the
 service to listen on a different container port; the compose mapping follows
 that value.
 
-Alternative backends launch the same API and contract:
+The other backend variants launch the same API and contract:
 
 ```sh
 # SQLite, with data in the sqlite-data volume (host port 8081)
 docker compose -f compose.sqlite.yml up --build
-
-# ClickHouse, with the HTTP API on its own internal network (host port 8082)
-docker compose -f compose.clickhouse.yml up --build
 
 # DuckDB, with an embedded database file in the duckdb-data volume (host port 8083)
 docker compose -f compose.duckdb.yml up --build
