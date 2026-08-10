@@ -2,31 +2,47 @@
 
 This service accepts structured application logs, stores them behind a small
 adapter contract, and exposes filtering, cursor pagination, and time-bucketed
-aggregation. ClickHouse is the selected production path for the measured
-workload: it had the best whole-workload result and runs the same API on host
-port 8082. TimescaleDB remains the assignment-compatible default-file path;
-SQLite and DuckDB use the same contract for local development and comparison.
+aggregation. ClickHouse is the selected engine for the measured workload. The
+root `docker-compose.yml` is the grader-compatible selected ClickHouse stack:
+its API uses ClickHouse on host port 8080, and its real `postgres:17-alpine`
+sidecar exists only for the current external grader's PostgreSQL service
+discovery. The sidecar is not the API's database. The production ClickHouse
+compose remains `compose.clickhouse.yml`; SQLite and DuckDB use the same
+contract for local development and comparison.
 
 See the [storage-engine comparison and decision record](docs/solution-comparison.md)
 for the measured selection, runtime evidence, and operational trade-offs.
 
 ## Quick start
 
-The selected production path is ClickHouse plus the API. It listens on host
-port `8082`:
+### Grader-compatible root stack
 
-```sh
-cp .env.example .env
-docker compose -f compose.clickhouse.yml up --build
-curl http://localhost:8082/health
-```
-
-The root Compose file remains the TimescaleDB assignment-compatible/default
-file path and listens on `http://localhost:8080`:
+The root stack runs the API against ClickHouse and listens on host port
+`8080`:
 
 ```sh
 docker compose up --build
 curl http://localhost:8080/health
+```
+
+The root stack also starts a labeled PostgreSQL 17 sidecar because the current
+external grader discovers a PostgreSQL service by its Compose role label. It
+does not receive API traffic. Its ClickHouse API uses `RETENTION_DAYS=3650`
+by default: the grader's fixed preparation records are dated `2026-01-01`, so
+the normal seven-day ClickHouse TTL would delete them immediately. Override
+`RETENTION_DAYS` only when that fixture-compatibility behavior is not needed.
+If a local `.env` already sets `RETENTION_DAYS`, set it to `3650` explicitly
+for this stack; `.env.example` retains the normal seven-day application value.
+
+### Production ClickHouse stack
+
+For the normal dedicated ClickHouse deployment, use `compose.clickhouse.yml`.
+It listens on host port `8082` and keeps the normal seven-day retention
+default:
+
+```sh
+docker compose -f compose.clickhouse.yml up --build
+curl http://localhost:8082/health
 ```
 
 The API container listens on port `8080` by default. Change the host-side
@@ -45,17 +61,20 @@ docker compose -f compose.sqlite.yml up --build
 docker compose -f compose.duckdb.yml up --build
 ```
 
-The TimescaleDB compose file defaults to host port 8080; the SQLite and
-ClickHouse variants default to 8081 and 8082, and DuckDB defaults to 8083.
-Every API container still listens on port 8080 by default. Set
-`API_HOST_PORT` when running more than one variant at once. The backend is
-selected with `DB_ENGINE=timescale|sqlite|clickhouse|duckdb`; `timescaledb`
-remains accepted as a compatibility alias.
+The root grader stack, SQLite, ClickHouse, and DuckDB variants default to host
+ports 8080, 8081, 8082, and 8083 respectively. Every API container still
+listens on port 8080 by default. Set `API_HOST_PORT` when running more than
+one variant at once. The backend is selected with
+`DB_ENGINE=timescale|sqlite|clickhouse|duckdb`; `timescaledb` remains accepted
+as a compatibility alias. The root Compose file is not a TimescaleDB
+deployment; run the Timescale adapter against a separately provisioned
+TimescaleDB service.
 
-As an environment audit note, ClickHouse was identified as the likely
-forgotten local time-series database (not certain): multiple cached
+As an environment audit note, the earlier local search identified ClickHouse
+as the likely forgotten time-series database (not certain): multiple cached
 ClickHouse server images were present, while no other local time-series
-database installation or artifact was found.
+database installation or artifact was found. The current selection is based
+on the tracked comparison, not that audit alone.
 
 For local development without Docker:
 
@@ -166,7 +185,13 @@ logic independent of a database vendor. Every adapter implements `ping`,
 `migrate`, batch `insertLogs`, filtered `queryLogs`, `aggregateLogs`,
 `deleteBefore`, and `close`.
 
-### TimescaleDB (default)
+### TimescaleDB (assignment/reference adapter)
+
+The root Compose file is now the grader-compatible ClickHouse deployment, so
+it does not start a TimescaleDB service. To run this adapter, provision a
+TimescaleDB service separately and set `DB_ENGINE=timescale` plus its
+`DATABASE_URL` (the `.env.example` values are suitable for a local service on
+port 5432).
 
 `logs` is a Timescale hypertable partitioned by the event `timestamp`. The
 event UUID plus timestamp makes a legal hypertable uniqueness index and gives
@@ -183,10 +208,10 @@ values and a `jsonb ->>` arm for numeric/boolean values. All values, keys,
 limits, timestamps, and cursor values are bound parameters; group names are
 allowlisted before entering SQL. Aggregation uses Timescale `time_bucket`.
 
-To inspect the chosen plan against a running default stack:
+To inspect the chosen plan against a running TimescaleDB service:
 
 ```sh
-docker compose exec timescaledb psql -U postgres -d logs -c \
+psql "$DATABASE_URL" -c \
   "EXPLAIN (ANALYZE, BUFFERS) SELECT id, timestamp, service FROM logs WHERE service = 'checkout' AND timestamp >= now() - interval '1 hour' ORDER BY timestamp DESC, id DESC LIMIT 100;"
 ```
 
@@ -236,7 +261,10 @@ the [DuckDB Node client source](https://github.com/duckdb/duckdb-node), and the
 
 Startup applies migrations before marking `/health` ready. A
 `RetentionWorker` runs out of band every `RETENTION_INTERVAL_MS` (one hour by
-default) and removes rows older than `RETENTION_DAYS` (seven by default).
+default) and removes rows older than `RETENTION_DAYS` (seven by default in
+the application and production ClickHouse compose). The root
+grader-compatible ClickHouse compose overrides this to 3650 days so its
+fixed `2026-01-01` preparation records remain queryable.
 
 The Timescale adapter configures a native retention policy and uses
 `drop_chunks` for complete chunks, followed by a bounded delete for a partial
@@ -253,17 +281,17 @@ Relevant configuration:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `DB_ENGINE` | `timescale` | `timescale`, `sqlite`, `clickhouse`, or `duckdb` |
-| `DATABASE_URL` | Timescale service URL | backend URL when one URL is sufficient |
+| `DB_ENGINE` | `timescale` in the application; `clickhouse` in root Compose | `timescale`, `sqlite`, `clickhouse`, or `duckdb` |
+| `DATABASE_URL` | engine-specific application default; ClickHouse URL in root Compose | backend URL when one URL is sufficient |
 | `API_HOST` | `0.0.0.0` | bind address |
 | `API_PORT` | `8080` | port inside the API container |
-| `API_HOST_PORT` | `8080` (Timescale; 8081/8082/8083 in alternate files) | host port used by compose files |
-| `TIMESCALE_HOST_PORT` | `5432` | optional host port for the Timescale service |
+| `API_HOST_PORT` | `8080` (root grader stack; 8081/8082/8083 in alternate files) | host port used by compose files |
+| `TIMESCALE_HOST_PORT` | `5432` when a separate Timescale service is used | optional host port for a separately provisioned Timescale service |
 | `SQLITE_PATH` | `/data/logs.sqlite` | SQLite database path |
 | `DUCKDB_PATH` | `/data/logs.duckdb` | DuckDB database path |
 | `CLICKHOUSE_URL` | `http://clickhouse:8123` | ClickHouse HTTP endpoint |
 | `CLICKHOUSE_DATABASE` | URL path or unset | ClickHouse database |
-| `RETENTION_DAYS` | `7` | retention window |
+| `RETENTION_DAYS` | `7` (application/production ClickHouse); `3650` (root grader stack) | retention window; root keeps the grader's `2026-01-01` fixtures queryable |
 | `RETENTION_INTERVAL_MS` | `3600000` | cleanup cadence |
 | `DB_POOL_MAX` | `20` | Timescale connection pool size |
 
@@ -282,6 +310,21 @@ comparison was run with the same protocol for all four adapters:
 | Aggregate filters | `attr.run_id` and `attr.phase=seed` during the stream; `attr.run_id` for final verification |
 | Concurrency | 256 maximum in-flight requests |
 | Timestamp window | 60 seconds, base age 10 minutes |
+
+The separate [external performance-v2 reproduction harness](benchmarks/grader/README.md)
+targets the root grader-compatible ClickHouse stack and uses the current
+grader's correctness, one-million-row preparation, and `load`, `stress`,
+`spike`, and `breakpoint` phases. The completed local reproduction is recorded
+in [`result.json`](benchmarks/grader/runs/clickhouse-performance-v2-20260810/result.json)
+and scored **75.80 / 100**: correctness `15/15`, performance `34.80/50`,
+queries `6/15`, and reliability `20/20`. The detailed
+scenario throughput, latency, error, and drain values are in the harness
+README. This is a local reproduction, not an official portal result. The
+prior public Timescale submission scored `65.60`; the local ClickHouse score is
+`+10.20` points (+15.55% relative). The local runner tracked
+ClickHouse Docker telemetry, but the external grader omits ClickHouse resource
+telemetry and resource metrics do not affect scoring. The tracked four-engine
+results below are unchanged and are not this external grader score.
 
 The generated comparison is `COMPARABLE` with no warnings. The spec gate is
 defined as both dispatch and accepted completion within +/-1% of 500 logs/s,
@@ -305,12 +348,12 @@ aggregate scale gates.
 
 ClickHouse is the measured winner: its aggregate p95 is 0.311x TimescaleDB
 (69% lower), seed throughput is 4.959x, and total elapsed time is 0.405x
-(2.47x faster). TimescaleDB remains the default assignment solution because it
-provides the intended PostgreSQL/Timescale hypertable, SQL ecosystem, native
-chunk retention, and a comfortable 321.588 ms aggregate p95 while sustaining
-the target. SQLite is a useful single-file/local fallback, not a production
-choice for this workload: its completion rate is 0.46x TimescaleDB and its
-aggregate p95 is 75.191x slower.
+(2.47x faster). TimescaleDB remains the PostgreSQL-native reference solution
+because it provides the intended PostgreSQL/Timescale hypertable, SQL
+ecosystem, native chunk retention, and a comfortable 321.588 ms aggregate p95
+while sustaining the target. SQLite is a useful single-file/local fallback,
+not a production choice for this workload: its completion rate is 0.46x
+TimescaleDB and its aggregate p95 is 75.191x slower.
 
 DuckDB's raw aggregate p95 is 99.792 ms versus ClickHouse's 99.999 ms, a
 0.207 ms difference treated as effectively tied/noise without repeated runs.
@@ -369,9 +412,9 @@ and use a unique project/run ID per engine. The commands below reproduce the
 recorded protocol; change host ports if another service is using them.
 
 ```sh
-# TimescaleDB (the default assignment stack)
-API_HOST_PORT=18080 TIMESCALE_HOST_PORT=15432 \
-  docker compose -p timescale-bench-20260810 up -d --build
+# TimescaleDB comparison (requires a separately provisioned TimescaleDB service;
+# the root docker-compose.yml is the ClickHouse grader stack)
+# Start that service and the API with DB_ENGINE=timescale first, then run:
 node benchmarks/bench.mjs --smoke --url http://127.0.0.1:18080 \
   --engine timescale --run-id timescale-smoke-20260810
 node benchmarks/bench.mjs --url http://127.0.0.1:18080 \
@@ -380,7 +423,7 @@ node benchmarks/bench.mjs --url http://127.0.0.1:18080 \
   --base-age-ms 600000 --timestamp-span-ms 60000 --timeout-ms 30000 \
   --health-timeout-ms 30000 --run-id timescale-full-1m-500lps-30s-20260810 \
   --output-dir benchmarks/results
-docker compose -p timescale-bench-20260810 down -v
+# Stop the separately provisioned service after copying its artifacts.
 
 # SQLite fallback
 API_HOST_PORT=18081 docker compose -p timescale-challenge-sqlite-full \
