@@ -28,6 +28,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate every compose variant
         run: |
-          for file in docker-compose.yml compose.sqlite.yml compose.clickhouse.yml; do
+          for file in docker-compose.yml compose.sqlite.yml compose.clickhouse.yml compose.duckdb.yml; do
             docker compose -f "$file" config --quiet
           done

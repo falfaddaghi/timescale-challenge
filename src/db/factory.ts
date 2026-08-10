@@ -1,5 +1,6 @@
 import type { AppConfig } from "../config";
 import { ClickHouseLogStore } from "./clickhouse";
+import { DuckDBLogStore } from "./duckdb";
 import { PostgresLogStore } from "./postgres";
 import type { LogStore } from "./store";
 import { SQLiteLogStore } from "./sqlite";
@@ -24,5 +25,7 @@ export function createLogStore(config: AppConfig): MigratableLogStore {
         password: config.clickhousePassword,
         requestTimeout: config.clickhouseRequestTimeoutMs,
       });
+    case "duckdb":
+      return new DuckDBLogStore(config.duckdbPath);
   }
 }

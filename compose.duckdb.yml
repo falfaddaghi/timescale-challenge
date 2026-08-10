@@ -1,0 +1,20 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      DB_ENGINE: duckdb
+      DATABASE_URL: duckdb:///data/logs.duckdb
+      DUCKDB_PATH: /data/logs.duckdb
+      RETENTION_DAYS: ${RETENTION_DAYS:-7}
+      RETENTION_INTERVAL_MS: ${RETENTION_INTERVAL_MS:-3600000}
+    ports:
+      - "${API_HOST_PORT:-8083}:8080"
+    volumes:
+      - duckdb-data:/data
+
+volumes:
+  duckdb-data:

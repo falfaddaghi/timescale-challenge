@@ -4,6 +4,7 @@ export interface AppConfig {
   port: number;
   databaseUrl: string;
   sqlitePath: string;
+  duckdbPath: string;
   clickhouseUrl: string;
   clickhouseDatabase?: string;
   clickhouseUsername?: string;
@@ -15,7 +16,7 @@ export interface AppConfig {
   bodyLimitBytes: number;
 }
 
-export const DB_ENGINES = ["timescale", "sqlite", "clickhouse"] as const;
+export const DB_ENGINES = ["timescale", "sqlite", "clickhouse", "duckdb"] as const;
 export type DbEngine = (typeof DB_ENGINES)[number];
 
 const parsePositiveInteger = (value: string | undefined, fallback: number, name: string): number => {
@@ -50,6 +51,8 @@ const defaultDatabaseUrl = (engine: DbEngine): string => {
       return "sqlite:///data/logs.sqlite";
     case "clickhouse":
       return "clickhouse://default:@clickhouse:8123/logs";
+    case "duckdb":
+      return "duckdb:///data/logs.duckdb";
   }
 };
 
@@ -63,6 +66,9 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): AppCon
     databaseUrl,
     sqlitePath: environment.SQLITE_PATH ?? (
       dbEngine === "sqlite" && databaseUrl.startsWith("sqlite:") ? databaseUrl : "/data/logs.sqlite"
+    ),
+    duckdbPath: environment.DUCKDB_PATH ?? (
+      dbEngine === "duckdb" && databaseUrl.startsWith("duckdb:") ? databaseUrl : "/data/logs.duckdb"
     ),
     clickhouseUrl: environment.CLICKHOUSE_URL ?? (
       dbEngine === "clickhouse" && /^(clickhouse|https?):\/\//.test(databaseUrl)
